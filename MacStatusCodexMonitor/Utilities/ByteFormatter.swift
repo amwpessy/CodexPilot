@@ -25,8 +25,16 @@ enum ByteFormatterUtility {
     }
 
     static func signedString(bytes: Int64) -> String {
-        let sign = bytes > 0 ? "+" : ""
-        return "\(sign)\(string(bytes: UInt64(abs(bytes))))"
+        let sign: String
+        if bytes > 0 {
+            sign = "+"
+        } else if bytes < 0 {
+            sign = "-"
+        } else {
+            sign = ""
+        }
+
+        return "\(sign)\(string(bytes: bytes.magnitude))"
     }
 
     static func rate(bytesPerSecond: UInt64) -> String {
