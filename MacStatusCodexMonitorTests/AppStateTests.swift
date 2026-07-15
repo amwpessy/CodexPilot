@@ -138,24 +138,24 @@ final class AppStateTests: XCTestCase {
 }
 
 private final class StubSystemMonitor: SystemMonitoring {
-    private var snapshots: [SystemSnapshot]
-    private let hook: () -> Void
+    private let snapshots: LockedBox<[SystemSnapshot]>
+    private let hook: @Sendable () -> Void
 
-    init(snapshots: [SystemSnapshot], hook: @escaping () -> Void = {}) {
-        self.snapshots = snapshots
+    init(snapshots: [SystemSnapshot], hook: @escaping @Sendable () -> Void = {}) {
+        self.snapshots = LockedBox(snapshots)
         self.hook = hook
     }
 
     func snapshot(previousIO: DiskIOSnapshot?) -> SystemSnapshot {
         hook()
-        return snapshots.removeFirst()
+        return snapshots.withLock { $0.removeFirst() }
     }
 }
 
 private struct StubDiskGrowthStore: DiskGrowthStoring {
     var growthSummary: DiskGrowthSummary
-    var recordHook: (DiskSnapshot) throws -> Void = { _ in }
-    var growthHook: () -> Void = {}
+    var recordHook: @Sendable (DiskSnapshot) throws -> Void = { _ in }
+    var growthHook: @Sendable () -> Void = {}
 
     func record(_ snapshot: DiskSnapshot) throws {
         try recordHook(snapshot)
@@ -169,7 +169,7 @@ private struct StubDiskGrowthStore: DiskGrowthStoring {
 
 private struct StubCacheAnalyzer: CacheAnalyzing {
     var result: CacheEstimate
-    var hook: () -> Void = {}
+    var hook: @Sendable () -> Void = {}
 
     func estimate() -> CacheEstimate {
         hook()
@@ -194,5 +194,21 @@ private final class LockedGate {
 
     func open() {
         semaphore.signal()
+    }
+}
+
+private final class LockedBox<Value>: @unchecked Sendable {
+    private let lock = NSLock()
+    private var storage: Value
+
+    init(_ storage: Value) {
+        self.storage = storage
+    }
+
+    @discardableResult
+    func withLock<Result>(_ body: (inout Value) -> Result) -> Result {
+        lock.lock()
+        defer { lock.unlock() }
+        return body(&storage)
     }
 }

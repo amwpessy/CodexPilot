@@ -1,15 +1,12 @@
 import Foundation
 
-final class CodexQuotaReader: @unchecked Sendable {
+struct CodexQuotaReader: Sendable {
     private let root: URL
-    private let fileManager: FileManager
 
     init(
-        root: URL = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".codex/sessions"),
-        fileManager: FileManager = .default
+        root: URL = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".codex/sessions")
     ) {
         self.root = root
-        self.fileManager = fileManager
     }
 
     func latestQuotaSnapshot() -> CodexQuotaSnapshot {
@@ -67,6 +64,7 @@ final class CodexQuotaReader: @unchecked Sendable {
     }
 
     private func jsonlFiles(in root: URL) -> [URL] {
+        let fileManager = FileManager.default
         guard let enumerator = fileManager.enumerator(
             at: root,
             includingPropertiesForKeys: [.contentModificationDateKey],

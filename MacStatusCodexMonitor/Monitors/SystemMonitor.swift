@@ -1,6 +1,7 @@
 import Foundation
 import IOKit.ps
 import MachO
+import os
 
 final class SystemMonitor: Sendable {
     struct CPUTicks {
@@ -163,22 +164,24 @@ final class SystemMonitor: Sendable {
     }
 }
 
-private final class LockedCPUTickHistory: @unchecked Sendable {
-    private let lock = NSLock()
-    private var previous: SystemMonitor.CPUTicks?
+private struct LockedCPUTickHistory: Sendable {
+    private let state = OSAllocatedUnfairLock(initialState: State())
 
     func sampleDelta(using provider: @Sendable () -> SystemMonitor.CPUTicks?) -> (previous: SystemMonitor.CPUTicks, current: SystemMonitor.CPUTicks)? {
-        lock.lock()
-        defer { lock.unlock() }
+        state.withLock { history in
+            guard let current = provider() else {
+                return nil
+            }
+            guard let previous = history.previous else {
+                history.previous = current
+                return nil
+            }
+            history.previous = current
+            return (previous, current)
+        }
+    }
 
-        guard let current = provider() else {
-            return nil
-        }
-        guard let previous else {
-            self.previous = current
-            return nil
-        }
-        self.previous = current
-        return (previous, current)
+    private struct State {
+        var previous: SystemMonitor.CPUTicks?
     }
 }

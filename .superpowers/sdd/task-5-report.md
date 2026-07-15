@@ -156,3 +156,59 @@ Notes:
 - `MacStatusCodexMonitor/App/AppState.swift`
 - `MacStatusCodexMonitor/Monitors/SystemMonitor.swift`
 - `MacStatusCodexMonitorTests/SystemMonitorTests.swift`
+
+---
+
+## Task 5 Sendability Gate Fix
+
+### What I fixed
+
+- Removed the remaining production `@unchecked Sendable` annotations from:
+  - `MacStatusCodexMonitor/Monitors/SystemMonitor.swift`
+  - `MacStatusCodexMonitor/Monitors/CacheAnalyzer.swift`
+  - `MacStatusCodexMonitor/Monitors/DiskGrowthStore.swift`
+  - `MacStatusCodexMonitor/Monitors/CodexQuotaReader.swift`
+- Replaced the unsafe CPU-history wrapper with `OSAllocatedUnfairLock` state in `LockedCPUTickHistory`, keeping CPU sample acquisition and baseline mutation serialized together.
+- Converted `CacheAnalyzer`, `DiskGrowthStore`, and `CodexQuotaReader` into Sendable value types that keep only configuration in stored state and create `FileManager.default` at use sites, so no non-Sendable reference state crosses the refresh queue boundary.
+- Updated the sendability-sensitive test doubles in `AppStateTests` and the CPU sample source in `SystemMonitorTests` so the remaining test/build output reflects environment issues rather than Swift 6 sendability warnings.
+
+### Tests/builds run and results, including whether any production `@unchecked Sendable` remains
+
+- Ran:
+  - `rg -n "@unchecked Sendable" /Users/laosuer/Xcode/60714SeeS/MacStatusCodexMonitor /Users/laosuer/Xcode/60714SeeS/MacStatusCodexMonitorTests`
+- Result:
+  - Only test helper `MacStatusCodexMonitorTests/SystemMonitorTests.swift:115` still contains `@unchecked Sendable`.
+  - No production `@unchecked Sendable` remains under `MacStatusCodexMonitor/`.
+
+- Ran:
+  - `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild build -project /Users/laosuer/Xcode/60714SeeS/MacStatusCodexMonitor.xcodeproj -scheme MacStatusCodexMonitor -destination 'platform=macOS' -derivedDataPath /private/tmp/task5-derived-data-build`
+- Result:
+  - `** BUILD SUCCEEDED **`
+  - No Swift sendability warnings were emitted from project sources.
+
+- Ran:
+  - `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild build-for-testing -project /Users/laosuer/Xcode/60714SeeS/MacStatusCodexMonitor.xcodeproj -scheme MacStatusCodexMonitor -destination 'platform=macOS' -derivedDataPath /private/tmp/task5-derived-data-bft-2`
+- Result:
+  - `** TEST BUILD SUCCEEDED **`
+  - Test-only Swift sendability warnings were cleared.
+  - Remaining warnings were environment/toolchain warnings:
+    - `MacStatusCodexMonitorTests: ld: warning: building for macOS-13.0, but linking with dylib '@rpath/XCTest.framework/Versions/A/XCTest' which was built for newer version 14.0`
+    - `MacStatusCodexMonitorTests: ld: warning: building for macOS-13.0, but linking with dylib '@rpath/libXCTestSwiftSupport.dylib' which was built for newer version 14.0`
+    - `warning: Metadata extraction skipped. No AppIntents.framework dependency found.`
+
+- Ran:
+  - `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild test -project /Users/laosuer/Xcode/60714SeeS/MacStatusCodexMonitor.xcodeproj -scheme MacStatusCodexMonitor -destination 'platform=macOS' -derivedDataPath /private/tmp/task5-derived-data-test`
+- Result:
+  - `** TEST FAILED **`
+  - Failure is the expected sandboxed runner issue, not a build/source failure:
+    - `The connection to service named com.apple.testmanagerd.control was invalidated: Connection init failed at lookup with error 159 - Sandbox restriction.`
+    - `attempt to post distributed notification 'IDETestProgressNotification' thwarted by sandboxing.`
+
+### Files changed
+
+- `MacStatusCodexMonitor/Monitors/CacheAnalyzer.swift`
+- `MacStatusCodexMonitor/Monitors/CodexQuotaReader.swift`
+- `MacStatusCodexMonitor/Monitors/DiskGrowthStore.swift`
+- `MacStatusCodexMonitor/Monitors/SystemMonitor.swift`
+- `MacStatusCodexMonitorTests/AppStateTests.swift`
+- `MacStatusCodexMonitorTests/SystemMonitorTests.swift`

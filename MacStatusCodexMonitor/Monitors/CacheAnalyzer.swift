@@ -1,12 +1,10 @@
 import Foundation
 
-final class CacheAnalyzer: @unchecked Sendable {
+struct CacheAnalyzer: Sendable {
     private let directories: [URL]
-    private let fileManager: FileManager
 
-    init(directories: [URL] = CacheAnalyzer.defaultDirectories(), fileManager: FileManager = .default) {
+    init(directories: [URL] = CacheAnalyzer.defaultDirectories()) {
         self.directories = directories
-        self.fileManager = fileManager
     }
 
     func estimate() -> CacheEstimate {
@@ -33,6 +31,7 @@ final class CacheAnalyzer: @unchecked Sendable {
     }
 
     private func directorySize(_ url: URL) -> UInt64 {
+        let fileManager = FileManager.default
         guard let enumerator = fileManager.enumerator(
             at: url,
             includingPropertiesForKeys: [.fileSizeKey, .isRegularFileKey],

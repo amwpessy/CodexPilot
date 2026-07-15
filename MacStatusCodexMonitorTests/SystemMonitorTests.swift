@@ -3,14 +3,14 @@ import XCTest
 
 final class SystemMonitorTests: XCTestCase {
     func testSnapshotComputesCPUUsageFromSampleDeltas() {
-        var samples = [
+        let samples = LockedBox([
             SystemMonitor.CPUTicks(user: 100, system: 50, idle: 150, nice: 0),
             SystemMonitor.CPUTicks(user: 140, system: 70, idle: 190, nice: 0),
-        ]
+        ])
 
         let monitor = SystemMonitor(
             now: { Date(timeIntervalSince1970: 1_000) },
-            cpuTicksProvider: { samples.removeFirst() },
+            cpuTicksProvider: { samples.withLock { $0.removeFirst() } },
             memoryProvider: {
                 SystemMonitor.MemorySample(usedBytes: 512, totalBytes: 1_024)
             },
