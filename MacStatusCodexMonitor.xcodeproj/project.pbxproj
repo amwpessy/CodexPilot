@@ -339,6 +339,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_TESTABILITY = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MacStatusCodexMonitor/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -349,6 +350,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = local.MacStatusCodexMonitor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -377,7 +379,7 @@
 		A1B2C3D4E5F600010000001F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "";
+				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -387,13 +389,14 @@
 				SDKROOT = macosx;
 				SWIFT_VERSION = 5.0;
 				TEST_TARGET_NAME = MacStatusCodexMonitor;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MacStatusCodexMonitor.app/Contents/MacOS/MacStatusCodexMonitor";
 			};
 			name = Debug;
 		};
 		A1B2C3D4E5F6000100000020 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "";
+				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -403,6 +406,7 @@
 				SDKROOT = macosx;
 				SWIFT_VERSION = 5.0;
 				TEST_TARGET_NAME = MacStatusCodexMonitor;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MacStatusCodexMonitor.app/Contents/MacOS/MacStatusCodexMonitor";
 			};
 			name = Release;
 		};
