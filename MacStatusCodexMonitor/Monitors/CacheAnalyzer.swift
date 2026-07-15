@@ -1,6 +1,6 @@
 import Foundation
 
-final class CacheAnalyzer {
+final class CacheAnalyzer: @unchecked Sendable {
     private let directories: [URL]
     private let fileManager: FileManager
 

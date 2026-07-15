@@ -2,16 +2,58 @@ import Foundation
 import IOKit.ps
 import MachO
 
-final class SystemMonitor {
+final class SystemMonitor: @unchecked Sendable {
+    struct CPUTicks {
+        var user: UInt32
+        var system: UInt32
+        var idle: UInt32
+        var nice: UInt32
+    }
+
+    struct MemorySample {
+        var usedBytes: UInt64
+        var totalBytes: UInt64
+
+        var usedPercent: Double? {
+            guard totalBytes > 0 else { return nil }
+            return Double(usedBytes) / Double(totalBytes) * 100
+        }
+    }
+
+    private let now: () -> Date
+    private let cpuTicksProvider: () -> CPUTicks?
+    private let memoryProvider: () -> MemorySample?
+    private let batteryProvider: () -> BatterySnapshot
+    private let diskCapacityProvider: () -> DiskCapacity
+    private let gpuProvider: () -> Availability<GPUSnapshot>
+    private var previousCPUTicks: CPUTicks?
+
+    init(
+        now: @escaping () -> Date = Date.init,
+        cpuTicksProvider: @escaping () -> CPUTicks? = SystemMonitor.readCPUTicks,
+        memoryProvider: @escaping () -> MemorySample? = SystemMonitor.readMemorySample,
+        batteryProvider: @escaping () -> BatterySnapshot = SystemMonitor.readBatterySnapshot,
+        diskCapacityProvider: @escaping () -> DiskCapacity = SystemMonitor.readDiskCapacity,
+        gpuProvider: @escaping () -> Availability<GPUSnapshot> = SystemMonitor.readGPUSnapshot
+    ) {
+        self.now = now
+        self.cpuTicksProvider = cpuTicksProvider
+        self.memoryProvider = memoryProvider
+        self.batteryProvider = batteryProvider
+        self.diskCapacityProvider = diskCapacityProvider
+        self.gpuProvider = gpuProvider
+    }
+
     func snapshot(previousIO: DiskIOSnapshot? = nil) -> SystemSnapshot {
-        let capacity = diskCapacity()
+        let capacity = diskCapacityProvider()
+        let memory = memoryProvider()
         return SystemSnapshot(
-            timestamp: Date(),
+            timestamp: now(),
             cpuUsage: cpuUsage(),
-            memoryUsedPercent: memoryUsedPercent(),
-            memoryUsedBytes: memoryUsedBytes(),
-            memoryTotalBytes: ProcessInfo.processInfo.physicalMemory,
-            battery: batterySnapshot(),
+            memoryUsedPercent: memory?.usedPercent,
+            memoryUsedBytes: memory?.usedBytes,
+            memoryTotalBytes: memory?.totalBytes,
+            battery: batteryProvider(),
             diskCapacity: capacity,
             diskIO: DiskIOSnapshot(
                 readBytesPerSecond: nil,
@@ -20,11 +62,30 @@ final class SystemMonitor {
                 writeBytes24h: nil,
                 sourceDescription: "System I/O estimate unavailable in v1 collector"
             ),
-            gpu: gpuSnapshot()
+            gpu: gpuProvider()
         )
     }
 
     private func cpuUsage() -> Double? {
+        guard let current = cpuTicksProvider() else {
+            return nil
+        }
+        defer { previousCPUTicks = current }
+        guard let previous = previousCPUTicks else {
+            return nil
+        }
+
+        let userDelta = Double(current.user) - Double(previous.user)
+        let systemDelta = Double(current.system) - Double(previous.system)
+        let idleDelta = Double(current.idle) - Double(previous.idle)
+        let niceDelta = Double(current.nice) - Double(previous.nice)
+        let activeDelta = userDelta + systemDelta + niceDelta
+        let totalDelta = activeDelta + idleDelta
+        guard totalDelta > 0 else { return nil }
+        return activeDelta / totalDelta * 100
+    }
+
+    private static func readCPUTicks() -> CPUTicks? {
         var load = host_cpu_load_info()
         var count = mach_msg_type_number_t(MemoryLayout<host_cpu_load_info>.stride / MemoryLayout<integer_t>.stride)
         let result = withUnsafeMutablePointer(to: &load) {
@@ -33,16 +94,15 @@ final class SystemMonitor {
             }
         }
         guard result == KERN_SUCCESS else { return nil }
-        let user = Double(load.cpu_ticks.0)
-        let system = Double(load.cpu_ticks.1)
-        let idle = Double(load.cpu_ticks.2)
-        let nice = Double(load.cpu_ticks.3)
-        let total = user + system + idle + nice
-        guard total > 0 else { return nil }
-        return (total - idle) / total * 100
+        return CPUTicks(
+            user: load.cpu_ticks.0,
+            system: load.cpu_ticks.1,
+            idle: load.cpu_ticks.2,
+            nice: load.cpu_ticks.3
+        )
     }
 
-    private func memoryUsedBytes() -> UInt64? {
+    private static func readMemorySample() -> MemorySample? {
         var stats = vm_statistics64()
         var count = mach_msg_type_number_t(MemoryLayout<vm_statistics64>.stride / MemoryLayout<integer_t>.stride)
         let result = withUnsafeMutablePointer(to: &stats) {
@@ -50,22 +110,20 @@ final class SystemMonitor {
                 host_statistics64(mach_host_self(), HOST_VM_INFO64, $0, &count)
             }
         }
-        guard result == KERN_SUCCESS else { return nil }
+        guard result == KERN_SUCCESS else {
+            return nil
+        }
         let pageSize = UInt64(vm_kernel_page_size)
         let active = UInt64(stats.active_count) * pageSize
         let wired = UInt64(stats.wire_count) * pageSize
         let compressed = UInt64(stats.compressor_page_count) * pageSize
-        return active + wired + compressed
+        return MemorySample(
+            usedBytes: active + wired + compressed,
+            totalBytes: ProcessInfo.processInfo.physicalMemory
+        )
     }
 
-    private func memoryUsedPercent() -> Double? {
-        guard let used = memoryUsedBytes() else { return nil }
-        let total = ProcessInfo.processInfo.physicalMemory
-        guard total > 0 else { return nil }
-        return Double(used) / Double(total) * 100
-    }
-
-    private func batterySnapshot() -> BatterySnapshot {
+    private static func readBatterySnapshot() -> BatterySnapshot {
         guard let info = IOPSCopyPowerSourcesInfo()?.takeRetainedValue(),
               let sources = IOPSCopyPowerSourcesList(info)?.takeRetainedValue() as? [CFTypeRef],
               let source = sources.first,
@@ -84,7 +142,7 @@ final class SystemMonitor {
         return BatterySnapshot(percent: percent, isCharging: charging, timeRemainingMinutes: minutes, statusText: charging ? "Charging" : "On battery")
     }
 
-    private func diskCapacity() -> DiskCapacity {
+    private static func readDiskCapacity() -> DiskCapacity {
         let home = FileManager.default.homeDirectoryForCurrentUser
         let keys: Set<URLResourceKey> = [.volumeTotalCapacityKey, .volumeAvailableCapacityForImportantUsageKey]
         let values = try? home.resourceValues(forKeys: keys)
@@ -93,7 +151,7 @@ final class SystemMonitor {
         return DiskCapacity(totalBytes: total, availableBytes: available)
     }
 
-    private func gpuSnapshot() -> Availability<GPUSnapshot> {
+    private static func readGPUSnapshot() -> Availability<GPUSnapshot> {
         .unavailable("GPU utilization unavailable through stable public API")
     }
 }

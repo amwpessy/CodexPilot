@@ -1,6 +1,6 @@
 import Foundation
 
-final class DiskGrowthStore {
+final class DiskGrowthStore: @unchecked Sendable {
     private let storageURL: URL
     private let retention: TimeInterval = 30 * 24 * 3600
     // Require a baseline close to the 24h target so sparse history cannot masquerade as a 24h delta.

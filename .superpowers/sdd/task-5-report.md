@@ -35,3 +35,45 @@ Notes:
 
 - `SystemMonitor.snapshot(previousIO:)` accepts the prior I/O snapshot per the required interface, but v1 still returns the brief’s placeholder “unavailable” disk I/O estimate and does not yet compute deltas from `previousIO`.
 - Build verification required the explicit Xcode binary path because the shell environment is currently pointed at Command Line Tools instead of full Xcode.
+
+---
+
+## Task 5 Fix After Review
+
+### What I fixed
+
+- Updated `SystemMonitor` to compute CPU usage from successive CPU tick deltas instead of a single boot-lifetime sample. The first sample now returns `nil`; subsequent samples return live usage percentage from the delta window.
+- Collapsed memory collection into a single sampled `MemorySample` per snapshot so `memoryUsedBytes` and `memoryUsedPercent` are derived from one read.
+- Changed `AppState.refresh()` into a main-actor entrypoint that schedules filesystem-heavy work onto a utility queue, then publishes the finished snapshot back on the main actor.
+- Prevented overlapping refresh work in `AppState` with an in-flight guard so scheduler/UI calls do not stack concurrent disk/cache/quota scans.
+- Added focused Task 5 tests covering CPU delta semantics, single memory sampling, off-main refresh work, and overlapping-refresh suppression.
+- Added narrow sendability annotations for the Task 5 monitor/store types used across the background refresh boundary.
+
+### Tests run and results
+
+- Ran:
+  - `/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test -project /Users/laosuer/Xcode/60714SeeS/MacStatusCodexMonitor.xcodeproj -scheme MacStatusCodexMonitor -destination 'platform=macOS' -derivedDataPath /private/tmp/MacStatusCodexMonitor-task5-fix-deriveddata`
+- Result:
+  - Build and test bundle compilation completed, but XCTest execution was blocked by the sandbox:
+  - `MacStatusCodexMonitor encountered an error (Failed to establish communication with the test runner. (Underlying Error: Couldn’t communicate with a helper application... com.apple.testmanagerd.control ... Sandbox restriction.))`
+
+- Ran:
+  - `/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild build-for-testing -project /Users/laosuer/Xcode/60714SeeS/MacStatusCodexMonitor.xcodeproj -scheme MacStatusCodexMonitor -destination 'platform=macOS' -derivedDataPath /private/tmp/MacStatusCodexMonitor-task5-fix-deriveddata`
+- Result:
+  - `TEST BUILD SUCCEEDED`
+
+- Ran:
+  - `/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild build -project /Users/laosuer/Xcode/60714SeeS/MacStatusCodexMonitor.xcodeproj -scheme MacStatusCodexMonitor -destination 'platform=macOS' -derivedDataPath /private/tmp/MacStatusCodexMonitor-task5-fix-deriveddata-build`
+- Result:
+  - `BUILD SUCCEEDED`
+
+### Files changed
+
+- `MacStatusCodexMonitor/App/AppState.swift`
+- `MacStatusCodexMonitor/Monitors/SystemMonitor.swift`
+- `MacStatusCodexMonitor/Monitors/DiskGrowthStore.swift`
+- `MacStatusCodexMonitor/Monitors/CacheAnalyzer.swift`
+- `MacStatusCodexMonitor/Monitors/CodexQuotaReader.swift`
+- `MacStatusCodexMonitorTests/AppStateTests.swift`
+- `MacStatusCodexMonitorTests/SystemMonitorTests.swift`
+- `MacStatusCodexMonitor.xcodeproj/project.pbxproj`

@@ -1,6 +1,6 @@
 import Foundation
 
-final class CodexQuotaReader {
+final class CodexQuotaReader: @unchecked Sendable {
     private let root: URL
     private let fileManager: FileManager
 

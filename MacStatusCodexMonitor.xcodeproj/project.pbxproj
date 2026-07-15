@@ -27,6 +27,8 @@
 		A1B2C3D4E5F6000100000034 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000015 /* AppState.swift */; };
 		A1B2C3D4E5F6000100000035 /* MonitoringScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000016 /* MonitoringScheduler.swift */; };
 		A1B2C3D4E5F6000100000036 /* SystemMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000017 /* SystemMonitor.swift */; };
+		A1B2C3D4E5F6000100000037 /* SystemMonitorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000018 /* SystemMonitorTests.swift */; };
+		A1B2C3D4E5F6000100000038 /* AppStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000019 /* AppStateTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,6 +65,8 @@
 		A1B2C3D4E5F6000200000015 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6000200000016 /* MonitoringScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitoringScheduler.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6000200000017 /* SystemMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemMonitor.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000200000018 /* SystemMonitorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemMonitorTests.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000200000019 /* AppStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -126,6 +130,8 @@
 				A1B2C3D4E5F600020000000A /* FormattingTests.swift */,
 				A1B2C3D4E5F6000200000010 /* CodexQuotaReaderTests.swift */,
 				A1B2C3D4E5F6000200000014 /* DiskGrowthStoreTests.swift */,
+				A1B2C3D4E5F6000200000018 /* SystemMonitorTests.swift */,
+				A1B2C3D4E5F6000200000019 /* AppStateTests.swift */,
 			);
 			path = MacStatusCodexMonitorTests;
 			sourceTree = "<group>";
@@ -301,6 +307,8 @@
 				A1B2C3D4E5F6000100000026 /* FormattingTests.swift in Sources */,
 				A1B2C3D4E5F600010000002E /* CodexQuotaReaderTests.swift in Sources */,
 				A1B2C3D4E5F6000100000033 /* DiskGrowthStoreTests.swift in Sources */,
+				A1B2C3D4E5F6000100000037 /* SystemMonitorTests.swift in Sources */,
+				A1B2C3D4E5F6000100000038 /* AppStateTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
