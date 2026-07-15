@@ -29,6 +29,9 @@
 		A1B2C3D4E5F6000100000036 /* SystemMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000017 /* SystemMonitor.swift */; };
 		A1B2C3D4E5F6000100000037 /* SystemMonitorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000018 /* SystemMonitorTests.swift */; };
 		A1B2C3D4E5F6000100000038 /* AppStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000019 /* AppStateTests.swift */; };
+		A1B2C3D4E5F6000100000039 /* MetricTile.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600020000001A /* MetricTile.swift */; };
+		A1B2C3D4E5F600010000003A /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600020000001B /* DashboardView.swift */; };
+		A1B2C3D4E5F600010000003B /* MenuBarPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600020000001C /* MenuBarPopoverView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +70,9 @@
 		A1B2C3D4E5F6000200000017 /* SystemMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemMonitor.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6000200000018 /* SystemMonitorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemMonitorTests.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6000200000019 /* AppStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateTests.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600020000001A /* MetricTile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricTile.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600020000001B /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600020000001C /* MenuBarPopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarPopoverView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,6 +115,7 @@
 				A1B2C3D4E5F600010000002C /* Models */,
 				A1B2C3D4E5F600010000002F /* Monitors */,
 				A1B2C3D4E5F600010000002D /* Utilities */,
+				A1B2C3D4E5F600010000003C /* Views */,
 				A1B2C3D4E5F6000200000003 /* Info.plist */,
 			);
 			path = MacStatusCodexMonitor;
@@ -164,6 +171,16 @@
 				A1B2C3D4E5F6000200000017 /* SystemMonitor.swift */,
 			);
 			path = Monitors;
+			sourceTree = "<group>";
+		};
+		A1B2C3D4E5F600010000003C /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D4E5F600020000001A /* MetricTile.swift */,
+				A1B2C3D4E5F600020000001B /* DashboardView.swift */,
+				A1B2C3D4E5F600020000001C /* MenuBarPopoverView.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 		A1B2C3D4E5F600010000000F /* Frameworks */ = {
@@ -288,6 +305,9 @@
 				A1B2C3D4E5F6000100000002 /* AppDelegate.swift in Sources */,
 				A1B2C3D4E5F6000100000034 /* AppState.swift in Sources */,
 				A1B2C3D4E5F6000100000035 /* MonitoringScheduler.swift in Sources */,
+				A1B2C3D4E5F6000100000039 /* MetricTile.swift in Sources */,
+				A1B2C3D4E5F600010000003A /* DashboardView.swift in Sources */,
+				A1B2C3D4E5F600010000003B /* MenuBarPopoverView.swift in Sources */,
 				A1B2C3D4E5F6000100000027 /* SystemSnapshot.swift in Sources */,
 				A1B2C3D4E5F6000100000028 /* DiskSnapshot.swift in Sources */,
 				A1B2C3D4E5F6000100000029 /* CodexQuotaSnapshot.swift in Sources */,
