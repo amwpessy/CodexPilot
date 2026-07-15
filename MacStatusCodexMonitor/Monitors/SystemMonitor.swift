@@ -2,7 +2,7 @@ import Foundation
 import IOKit.ps
 import MachO
 
-final class SystemMonitor: @unchecked Sendable {
+final class SystemMonitor: Sendable {
     struct CPUTicks {
         var user: UInt32
         var system: UInt32
@@ -20,21 +20,32 @@ final class SystemMonitor: @unchecked Sendable {
         }
     }
 
-    private let now: () -> Date
-    private let cpuTicksProvider: () -> CPUTicks?
-    private let memoryProvider: () -> MemorySample?
-    private let batteryProvider: () -> BatterySnapshot
-    private let diskCapacityProvider: () -> DiskCapacity
-    private let gpuProvider: () -> Availability<GPUSnapshot>
-    private var previousCPUTicks: CPUTicks?
+    private let now: @Sendable () -> Date
+    private let cpuTicksProvider: @Sendable () -> CPUTicks?
+    private let memoryProvider: @Sendable () -> MemorySample?
+    private let batteryProvider: @Sendable () -> BatterySnapshot
+    private let diskCapacityProvider: @Sendable () -> DiskCapacity
+    private let gpuProvider: @Sendable () -> Availability<GPUSnapshot>
+    private let cpuTickHistory = LockedCPUTickHistory()
+
+    convenience init() {
+        self.init(
+            now: { Date() },
+            cpuTicksProvider: { Self.readCPUTicks() },
+            memoryProvider: { Self.readMemorySample() },
+            batteryProvider: { Self.readBatterySnapshot() },
+            diskCapacityProvider: { Self.readDiskCapacity() },
+            gpuProvider: { Self.readGPUSnapshot() }
+        )
+    }
 
     init(
-        now: @escaping () -> Date = Date.init,
-        cpuTicksProvider: @escaping () -> CPUTicks? = SystemMonitor.readCPUTicks,
-        memoryProvider: @escaping () -> MemorySample? = SystemMonitor.readMemorySample,
-        batteryProvider: @escaping () -> BatterySnapshot = SystemMonitor.readBatterySnapshot,
-        diskCapacityProvider: @escaping () -> DiskCapacity = SystemMonitor.readDiskCapacity,
-        gpuProvider: @escaping () -> Availability<GPUSnapshot> = SystemMonitor.readGPUSnapshot
+        now: @escaping @Sendable () -> Date,
+        cpuTicksProvider: @escaping @Sendable () -> CPUTicks?,
+        memoryProvider: @escaping @Sendable () -> MemorySample?,
+        batteryProvider: @escaping @Sendable () -> BatterySnapshot,
+        diskCapacityProvider: @escaping @Sendable () -> DiskCapacity,
+        gpuProvider: @escaping @Sendable () -> Availability<GPUSnapshot>
     ) {
         self.now = now
         self.cpuTicksProvider = cpuTicksProvider
@@ -70,8 +81,7 @@ final class SystemMonitor: @unchecked Sendable {
         guard let current = cpuTicksProvider() else {
             return nil
         }
-        defer { previousCPUTicks = current }
-        guard let previous = previousCPUTicks else {
+        guard let previous = cpuTickHistory.swap(current) else {
             return nil
         }
 
@@ -153,5 +163,19 @@ final class SystemMonitor: @unchecked Sendable {
 
     private static func readGPUSnapshot() -> Availability<GPUSnapshot> {
         .unavailable("GPU utilization unavailable through stable public API")
+    }
+}
+
+private final class LockedCPUTickHistory: @unchecked Sendable {
+    private let lock = NSLock()
+    private var previous: SystemMonitor.CPUTicks?
+
+    func swap(_ current: SystemMonitor.CPUTicks) -> SystemMonitor.CPUTicks? {
+        lock.lock()
+        defer {
+            previous = current
+            lock.unlock()
+        }
+        return previous
     }
 }

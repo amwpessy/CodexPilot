@@ -77,3 +77,42 @@ Notes:
 - `MacStatusCodexMonitorTests/AppStateTests.swift`
 - `MacStatusCodexMonitorTests/SystemMonitorTests.swift`
 - `MacStatusCodexMonitor.xcodeproj/project.pbxproj`
+
+---
+
+## Task 5 Re-review Fix
+
+### What I fixed
+
+- Removed `@unchecked Sendable` from `SystemMonitor`.
+- Moved mutable CPU history into a private lock-backed `LockedCPUTickHistory` so shared `snapshot()` calls update/read `previousCPUTicks` under synchronization instead of unsafely mutating class state across executors.
+- Kept the `SystemMonitor` surface area unchanged and limited the test changes to `SystemMonitor` coverage for the synchronized CPU-history path.
+- Added a concurrent `snapshot()` regression test that coordinates two simultaneous callers and verifies they observe sequential CPU deltas rather than racing over the same baseline sample.
+
+### Tests run and results
+
+- Ran:
+  - `/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test -project /Users/laosuer/Xcode/60714SeeS/MacStatusCodexMonitor.xcodeproj -scheme MacStatusCodexMonitor -destination 'platform=macOS' -derivedDataPath /private/tmp/MacStatusCodexMonitor-task5-rereview-test`
+- Result:
+  - `Testing failed:`
+  - `MacStatusCodexMonitor encountered an error (Failed to establish communication with the test runner. (Underlying Error: Couldn’t communicate with a helper application... com.apple.testmanagerd.control ... Sandbox restriction.))`
+  - `IDETestOperationsObserverDebug: Failure collecting logarchive: Error Domain=NSCocoaErrorDomain Code=4099 "The connection to service named com.apple.testmanagerd.control was invalidated: Connection init failed at lookup with error 159 - Sandbox restriction."`
+
+- Ran:
+  - `/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild build-for-testing -project /Users/laosuer/Xcode/60714SeeS/MacStatusCodexMonitor.xcodeproj -scheme MacStatusCodexMonitor -destination 'platform=macOS' -derivedDataPath /private/tmp/MacStatusCodexMonitor-task5-rereview-bft2`
+- Result:
+  - `** TEST BUILD SUCCEEDED **`
+
+- Ran:
+  - `/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild build -project /Users/laosuer/Xcode/60714SeeS/MacStatusCodexMonitor.xcodeproj -scheme MacStatusCodexMonitor -destination 'platform=macOS' -derivedDataPath /private/tmp/MacStatusCodexMonitor-task5-rereview-build2`
+- Result:
+  - `** BUILD SUCCEEDED **`
+
+### Files changed
+
+- `MacStatusCodexMonitor/Monitors/SystemMonitor.swift`
+- `MacStatusCodexMonitorTests/SystemMonitorTests.swift`
+
+### Concerns
+
+- The requested Task 5 fix is in place, but the project still emits a pre-existing `AppState.buildRefreshResult(...)` actor-isolation warning during Xcode builds. I left that untouched because this re-review was scoped to the `SystemMonitor` CPU-history sendability issue only.
