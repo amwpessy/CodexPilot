@@ -52,4 +52,15 @@ final class CodexQuotaReaderTests: XCTestCase {
         let line = #"{"timestamp":"2026-07-15T07:55:30.701Z","type":"event_msg","payload":{"type":"agent_message","text":"hello"}}"#
         XCTAssertNil(CodexQuotaReader(root: URL(fileURLWithPath: "/tmp/none")).parseLine(line, fileModifiedAt: nil))
     }
+
+    func testParsesSecondaryAndResetCardLikeQuotaExtras() {
+        let line = """
+        {"timestamp":"2026-07-15T07:55:30.701Z","type":"event_msg","payload":{"type":"token_count","rate_limits":{"limit_id":"codex","primary":{"used_percent":10.0,"window_minutes":60,"resets_at":1784704630},"secondary":{"used_percent":50.0,"window_minutes":10080},"reset_cards_remaining":2,"credits":{"has_credits":true,"unlimited":false,"balance":1},"individual_limit":null,"plan_type":"team","rate_limit_reached_type":null}}}
+        """
+
+        let snapshot = CodexQuotaReader(root: URL(fileURLWithPath: "/tmp/none")).parseLine(line, fileModifiedAt: nil)
+
+        XCTAssertTrue(snapshot?.extraQuotaDescription.contains("secondary") == true)
+        XCTAssertTrue(snapshot?.extraQuotaDescription.contains("reset_cards_remaining: 2") == true)
+    }
 }

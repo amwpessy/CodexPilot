@@ -59,6 +59,7 @@ struct CodexQuotaReader: Sendable {
             planType: rateLimits["plan_type"] as? String,
             creditsDescription: Self.creditsDescription(rateLimits["credits"]),
             individualLimitDescription: rateLimits["individual_limit"].map(Self.describeJSONValue) ?? "Not reported",
+            extraQuotaDescription: Self.extraQuotaDescription(rateLimits),
             rateLimitReachedType: rateLimits["rate_limit_reached_type"] as? String
         )
     }
@@ -107,6 +108,31 @@ struct CodexQuotaReader: Sendable {
         }
 
         return hasCredits == true ? "Credits available" : "Not reported"
+    }
+
+    private static func extraQuotaDescription(_ rateLimits: [String: Any]) -> String {
+        var parts: [String] = []
+
+        if let secondary = rateLimits["secondary"], !(secondary is NSNull) {
+            parts.append("secondary: \(describeJSONValue(secondary))")
+        }
+
+        let resetCardKeys = rateLimits.keys
+            .filter { key in
+                let lowered = key.lowercased()
+                return lowered.contains("reset") || lowered.contains("card")
+            }
+            .filter { $0 != "rate_limit_reached_type" }
+            .sorted()
+
+        for key in resetCardKeys {
+            guard let value = rateLimits[key], !(value is NSNull) else {
+                continue
+            }
+            parts.append("\(key): \(describeJSONValue(value))")
+        }
+
+        return parts.isEmpty ? "Not reported" : parts.joined(separator: " / ")
     }
 
     private static func describeJSONValue(_ value: Any) -> String {

@@ -24,7 +24,10 @@ struct DashboardView: View {
 
                 section("Disk Growth & Cache") {
                     MetricTile(title: "24h Growth", value: diskGrowthValue, detail: state.diskGrowth.statusText)
-                    MetricTile(title: "Cache Estimate", value: ByteFormatterUtility.string(bytes: state.cacheEstimate.totalBytes), detail: state.cacheEstimate.statusText)
+                    MetricTile(title: "24h Read", value: diskRead24hValue, detail: diskIODetail)
+                    MetricTile(title: "24h Write", value: diskWrite24hValue, detail: diskIODetail)
+                    MetricTile(title: "Cache Total", value: ByteFormatterUtility.string(bytes: state.cacheEstimate.totalBytes), detail: "Current cache-like size")
+                    MetricTile(title: "24h Cache Growth", value: cacheGrowthValue, detail: cacheGrowthDetail)
                     ForEach(state.cacheEstimate.entries) { entry in
                         HStack {
                             Text(entry.path)
@@ -41,7 +44,8 @@ struct DashboardView: View {
                 section("Codex Quota") {
                     MetricTile(title: "Used", value: PercentFormatterUtility.string(state.codexQuota.usedPercent), detail: state.codexQuota.sourceDescription)
                     MetricTile(title: "Reset", value: resetValue, detail: "Plan: \(state.codexQuota.planType ?? "Not reported")")
-                    MetricTile(title: "Credits", value: state.codexQuota.creditsDescription, detail: "Individual limit: \(state.codexQuota.individualLimitDescription)")
+                    MetricTile(title: "Reset Cards", value: state.codexQuota.extraQuotaDescription, detail: "Credits: \(state.codexQuota.creditsDescription)")
+                    MetricTile(title: "Limit", value: state.codexQuota.individualLimitDescription, detail: state.codexQuota.rateLimitReachedType ?? "No rate-limit stop reported")
                 }
             }
             .padding(20)
@@ -101,6 +105,40 @@ struct DashboardView: View {
             return "Learning"
         }
         return ByteFormatterUtility.signedString(bytes: growth)
+    }
+
+    private var diskRead24hValue: String {
+        guard let bytes = state.system.diskIO.readBytes24h else {
+            return "Learning"
+        }
+        return ByteFormatterUtility.string(bytes: bytes)
+    }
+
+    private var diskWrite24hValue: String {
+        guard let bytes = state.system.diskIO.writeBytes24h else {
+            return "Learning"
+        }
+        return ByteFormatterUtility.string(bytes: bytes)
+    }
+
+    private var diskIODetail: String {
+        let readRate = state.system.diskIO.readBytesPerSecond.map(ByteFormatterUtility.rate) ?? "rate learning"
+        let writeRate = state.system.diskIO.writeBytesPerSecond.map(ByteFormatterUtility.rate) ?? "rate learning"
+        return "\(state.system.diskIO.sourceDescription) / R \(readRate), W \(writeRate)"
+    }
+
+    private var cacheGrowthValue: String {
+        guard let growth = state.cacheEstimate.growthBytes24h else {
+            return "Learning"
+        }
+        return ByteFormatterUtility.signedString(bytes: growth)
+    }
+
+    private var cacheGrowthDetail: String {
+        if let share = state.cacheEstimate.growthShareOfDiskGrowth {
+            return "\(state.cacheEstimate.statusText) / \(PercentFormatterUtility.string(share)) of disk growth"
+        }
+        return state.cacheEstimate.statusText
     }
 
     private var resetValue: String {

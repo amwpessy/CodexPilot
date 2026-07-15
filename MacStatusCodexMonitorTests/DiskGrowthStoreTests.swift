@@ -97,6 +97,50 @@ final class DiskGrowthStoreTests: XCTestCase {
         XCTAssertEqual(estimate.statusText, "User-cache estimate")
     }
 
+    func testDiskIOHistoryComputesTwentyFourHourReadWriteDeltas() throws {
+        let directory = try makeTemporaryDirectory()
+        let store = DiskIOHistoryStore(storageURL: directory.appendingPathComponent("disk-io.json"))
+        let now = Date(timeIntervalSince1970: 10_000_000)
+
+        try store.record(DiskIOTotalSnapshot(timestamp: now.addingTimeInterval(-24 * 3600), readBytes: 1_000, writeBytes: 2_000))
+        try store.record(DiskIOTotalSnapshot(timestamp: now, readBytes: 3_500, writeBytes: 7_250))
+
+        let summary = store.summary(now: now)
+
+        XCTAssertEqual(summary.readBytes24h, 2_500)
+        XCTAssertEqual(summary.writeBytes24h, 5_250)
+        XCTAssertEqual(summary.statusText, "24h I/O history ready")
+    }
+
+    func testDiskIOHistoryReportsLearningForSparseTwentyFourHourBaseline() throws {
+        let directory = try makeTemporaryDirectory()
+        let store = DiskIOHistoryStore(storageURL: directory.appendingPathComponent("disk-io.json"))
+        let now = Date(timeIntervalSince1970: 10_000_000)
+
+        try store.record(DiskIOTotalSnapshot(timestamp: now.addingTimeInterval(-40 * 3600), readBytes: 1_000, writeBytes: 2_000))
+        try store.record(DiskIOTotalSnapshot(timestamp: now, readBytes: 3_500, writeBytes: 7_250))
+
+        let summary = store.summary(now: now)
+
+        XCTAssertNil(summary.readBytes24h)
+        XCTAssertNil(summary.writeBytes24h)
+        XCTAssertEqual(summary.statusText, "Learning: sparse 24h I/O history")
+    }
+
+    func testCacheGrowthStoreComputesTwentyFourHourCacheDelta() throws {
+        let directory = try makeTemporaryDirectory()
+        let store = CacheGrowthStore(storageURL: directory.appendingPathComponent("cache.json"))
+        let now = Date(timeIntervalSince1970: 10_000_000)
+
+        try store.record(CacheSnapshot(timestamp: now.addingTimeInterval(-24 * 3600), totalBytes: 2_000))
+        try store.record(CacheSnapshot(timestamp: now, totalBytes: 3_500))
+
+        let summary = store.summary(now: now)
+
+        XCTAssertEqual(summary.growthBytes, 1_500)
+        XCTAssertEqual(summary.statusText, "24h cache history ready")
+    }
+
     private func makeTemporaryDirectory() throws -> URL {
         let directory = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString, isDirectory: true)

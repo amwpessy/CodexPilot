@@ -31,6 +31,13 @@ final class AppStateTests: XCTestCase {
             diskStore: StubDiskGrowthStore(
                 growthSummary: DiskGrowthSummary(latest: nil, baseline: nil, growthBytes: nil, observedHours: 0, statusText: "none")
             ),
+            cacheStore: StubCacheGrowthStore(summaryResult: CacheGrowthSummary(
+                latest: nil,
+                baseline: nil,
+                growthBytes: nil,
+                observedHours: 0,
+                statusText: "cache"
+            )),
             cacheAnalyzer: StubCacheAnalyzer(result: CacheEstimate(totalBytes: 0, entries: [], scannedAt: Date(), statusText: "none")),
             codexReader: StubCodexQuotaReader(result: refreshedQuota)
         )
@@ -99,6 +106,13 @@ final class AppStateTests: XCTestCase {
                     workRanOffMainActor.fulfill()
                 }
             ),
+            cacheStore: StubCacheGrowthStore(summaryResult: CacheGrowthSummary(
+                latest: nil,
+                baseline: nil,
+                growthBytes: nil,
+                observedHours: 0,
+                statusText: "cache"
+            )),
             cacheAnalyzer: StubCacheAnalyzer(result: expectedCache) {
                 XCTAssertFalse(Thread.isMainThread)
                 workRanOffMainActor.fulfill()
@@ -128,6 +142,74 @@ final class AppStateTests: XCTestCase {
         XCTAssertEqual(state.codexQuota.limitID, expectedQuota.limitID)
     }
 
+    func testRefreshPublishesDiskIOHistoryAndRates() async {
+        let updated = expectation(description: "updated")
+        let initialSnapshot = makeSystemSnapshot(
+            timestamp: Date(timeIntervalSince1970: 10),
+            cpuUsage: 10,
+            diskIO: DiskIOSnapshot(
+                readBytesPerSecond: nil,
+                writeBytesPerSecond: nil,
+                readBytes24h: nil,
+                writeBytes24h: nil,
+                sourceDescription: "stub",
+                totalReadBytes: 1_000,
+                totalWriteBytes: 2_000
+            )
+        )
+        let refreshedSnapshot = makeSystemSnapshot(
+            timestamp: Date(timeIntervalSince1970: 20),
+            cpuUsage: 20,
+            diskIO: DiskIOSnapshot(
+                readBytesPerSecond: nil,
+                writeBytesPerSecond: nil,
+                readBytes24h: nil,
+                writeBytes24h: nil,
+                sourceDescription: "stub",
+                totalReadBytes: 1_600,
+                totalWriteBytes: 2_900
+            )
+        )
+        let ioSummary = DiskIOHistorySummary(
+            latest: DiskIOTotalSnapshot(timestamp: refreshedSnapshot.timestamp, readBytes: 1_600, writeBytes: 2_900),
+            baseline: DiskIOTotalSnapshot(timestamp: refreshedSnapshot.timestamp.addingTimeInterval(-24 * 3600), readBytes: 100, writeBytes: 500),
+            readBytes24h: 1_500,
+            writeBytes24h: 2_400,
+            observedHours: 24,
+            statusText: "24h I/O history ready"
+        )
+
+        let state = AppState(
+            systemMonitor: StubSystemMonitor(snapshots: [initialSnapshot, refreshedSnapshot]),
+            diskStore: StubDiskGrowthStore(
+                growthSummary: DiskGrowthSummary(latest: nil, baseline: nil, growthBytes: nil, observedHours: 0, statusText: "none")
+            ),
+            diskIOStore: StubDiskIOHistoryStore(summary: ioSummary),
+            cacheStore: StubCacheGrowthStore(),
+            cacheAnalyzer: StubCacheAnalyzer(result: CacheEstimate(totalBytes: 0, entries: [], scannedAt: Date(), statusText: "none")),
+            codexReader: StubCodexQuotaReader(result: .unavailable)
+        )
+
+        state.refresh()
+        Task {
+            while true {
+                if state.system.timestamp == refreshedSnapshot.timestamp {
+                    updated.fulfill()
+                    break
+                }
+                try? await Task.sleep(nanoseconds: 10_000_000)
+            }
+        }
+
+        await fulfillment(of: [updated], timeout: 2.0)
+
+        XCTAssertEqual(state.system.diskIO.readBytes24h, 1_500)
+        XCTAssertEqual(state.system.diskIO.writeBytes24h, 2_400)
+        XCTAssertEqual(state.system.diskIO.readBytesPerSecond, 60)
+        XCTAssertEqual(state.system.diskIO.writeBytesPerSecond, 90)
+        XCTAssertEqual(state.system.diskIO.sourceDescription, "24h I/O history ready")
+    }
+
     func testRefreshSkipsOverlappingWork() async {
         let workStarted = expectation(description: "workStarted")
         let releaseWork = expectation(description: "releaseWork")
@@ -146,6 +228,7 @@ final class AppStateTests: XCTestCase {
             diskStore: StubDiskGrowthStore(
                 growthSummary: DiskGrowthSummary(latest: nil, baseline: nil, growthBytes: nil, observedHours: 0, statusText: "none")
             ),
+            cacheStore: StubCacheGrowthStore(),
             cacheAnalyzer: StubCacheAnalyzer(result: CacheEstimate(totalBytes: 0, entries: [], scannedAt: Date(), statusText: "none")),
             codexReader: StubCodexQuotaReader(result: .unavailable)
         )
@@ -162,7 +245,17 @@ final class AppStateTests: XCTestCase {
         XCTAssertEqual(refreshCalls, 1)
     }
 
-    private func makeSystemSnapshot(timestamp: Date, cpuUsage: Double?) -> SystemSnapshot {
+    private func makeSystemSnapshot(
+        timestamp: Date,
+        cpuUsage: Double?,
+        diskIO: DiskIOSnapshot = DiskIOSnapshot(
+            readBytesPerSecond: nil,
+            writeBytesPerSecond: nil,
+            readBytes24h: nil,
+            writeBytes24h: nil,
+            sourceDescription: "stub"
+        )
+    ) -> SystemSnapshot {
         SystemSnapshot(
             timestamp: timestamp,
             cpuUsage: cpuUsage,
@@ -171,13 +264,7 @@ final class AppStateTests: XCTestCase {
             memoryTotalBytes: 1_024,
             battery: BatterySnapshot(percent: 80, isCharging: true, timeRemainingMinutes: nil, statusText: "Charging"),
             diskCapacity: DiskCapacity(totalBytes: 1_000, availableBytes: 300),
-            diskIO: DiskIOSnapshot(
-                readBytesPerSecond: nil,
-                writeBytesPerSecond: nil,
-                readBytes24h: nil,
-                writeBytes24h: nil,
-                sourceDescription: "stub"
-            ),
+            diskIO: diskIO,
             gpu: .unavailable("stub")
         )
     }
@@ -210,6 +297,38 @@ private struct StubDiskGrowthStore: DiskGrowthStoring {
     func growthSummary(now: Date) -> DiskGrowthSummary {
         growthHook()
         return growthSummary
+    }
+}
+
+private struct StubDiskIOHistoryStore: DiskIOHistoryStoring {
+    var summary: DiskIOHistorySummary
+    var recordHook: @Sendable (DiskIOTotalSnapshot) throws -> Void = { _ in }
+
+    func record(_ snapshot: DiskIOTotalSnapshot) throws {
+        try recordHook(snapshot)
+    }
+
+    func summary(now: Date) -> DiskIOHistorySummary {
+        summary
+    }
+}
+
+private struct StubCacheGrowthStore: CacheGrowthStoring {
+    var summaryResult = CacheGrowthSummary(
+        latest: nil,
+        baseline: nil,
+        growthBytes: nil,
+        observedHours: 0,
+        statusText: "cache history"
+    )
+    var recordHook: @Sendable (CacheSnapshot) throws -> Void = { _ in }
+
+    func record(_ snapshot: CacheSnapshot) throws {
+        try recordHook(snapshot)
+    }
+
+    func summary(now: Date) -> CacheGrowthSummary {
+        summaryResult
     }
 }
 

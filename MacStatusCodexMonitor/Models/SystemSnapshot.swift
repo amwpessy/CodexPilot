@@ -54,6 +54,41 @@ struct DiskIOSnapshot {
     var readBytes24h: UInt64?
     var writeBytes24h: UInt64?
     var sourceDescription: String
+    var totalReadBytes: UInt64?
+    var totalWriteBytes: UInt64?
+
+    init(
+        readBytesPerSecond: UInt64?,
+        writeBytesPerSecond: UInt64?,
+        readBytes24h: UInt64?,
+        writeBytes24h: UInt64?,
+        sourceDescription: String,
+        totalReadBytes: UInt64? = nil,
+        totalWriteBytes: UInt64? = nil
+    ) {
+        self.readBytesPerSecond = readBytesPerSecond
+        self.writeBytesPerSecond = writeBytesPerSecond
+        self.readBytes24h = readBytes24h
+        self.writeBytes24h = writeBytes24h
+        self.sourceDescription = sourceDescription
+        self.totalReadBytes = totalReadBytes
+        self.totalWriteBytes = totalWriteBytes
+    }
+}
+
+struct DiskIOTotalSnapshot: Codable, Equatable {
+    var timestamp: Date
+    var readBytes: UInt64
+    var writeBytes: UInt64
+}
+
+struct DiskIOHistorySummary: Equatable {
+    var latest: DiskIOTotalSnapshot?
+    var baseline: DiskIOTotalSnapshot?
+    var readBytes24h: UInt64?
+    var writeBytes24h: UInt64?
+    var observedHours: Double
+    var statusText: String
 }
 
 struct GPUSnapshot {

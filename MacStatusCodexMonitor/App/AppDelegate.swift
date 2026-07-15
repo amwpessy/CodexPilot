@@ -39,7 +39,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         touchBarController = touchController
         NSApp.touchBar = touchController.makeTouchBar()
         observeStateForMenuBarTitle()
-        scheduler.start(interval: 30) { [weak self] in
+        scheduler.start(interval: 120) { [weak self] in
             Task { @MainActor in
                 self?.ensureState().refresh()
                 self?.updateMenuBarTitle()

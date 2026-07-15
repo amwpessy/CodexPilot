@@ -1,4 +1,5 @@
 import Foundation
+import IOKit
 import IOKit.ps
 import MachO
 import os
@@ -26,6 +27,7 @@ final class SystemMonitor: Sendable {
     private let memoryProvider: @Sendable () -> MemorySample?
     private let batteryProvider: @Sendable () -> BatterySnapshot
     private let diskCapacityProvider: @Sendable () -> DiskCapacity
+    private let diskIOProvider: @Sendable () -> DiskIOTotalSnapshot?
     private let gpuProvider: @Sendable () -> Availability<GPUSnapshot>
     private let cpuTickHistory = LockedCPUTickHistory()
 
@@ -36,6 +38,7 @@ final class SystemMonitor: Sendable {
             memoryProvider: { Self.readMemorySample() },
             batteryProvider: { Self.readBatterySnapshot() },
             diskCapacityProvider: { Self.readDiskCapacity() },
+            diskIOProvider: { Self.readDiskIOTotalSnapshot() },
             gpuProvider: { Self.readGPUSnapshot() }
         )
     }
@@ -46,6 +49,7 @@ final class SystemMonitor: Sendable {
         memoryProvider: @escaping @Sendable () -> MemorySample?,
         batteryProvider: @escaping @Sendable () -> BatterySnapshot,
         diskCapacityProvider: @escaping @Sendable () -> DiskCapacity,
+        diskIOProvider: @escaping @Sendable () -> DiskIOTotalSnapshot? = { nil },
         gpuProvider: @escaping @Sendable () -> Availability<GPUSnapshot>
     ) {
         self.now = now
@@ -53,14 +57,17 @@ final class SystemMonitor: Sendable {
         self.memoryProvider = memoryProvider
         self.batteryProvider = batteryProvider
         self.diskCapacityProvider = diskCapacityProvider
+        self.diskIOProvider = diskIOProvider
         self.gpuProvider = gpuProvider
     }
 
     func snapshot(previousIO: DiskIOSnapshot? = nil) -> SystemSnapshot {
         let capacity = diskCapacityProvider()
         let memory = memoryProvider()
+        let timestamp = now()
+        let ioTotals = diskIOProvider()
         return SystemSnapshot(
-            timestamp: now(),
+            timestamp: timestamp,
             cpuUsage: cpuUsage(),
             memoryUsedPercent: memory?.usedPercent,
             memoryUsedBytes: memory?.usedBytes,
@@ -72,7 +79,9 @@ final class SystemMonitor: Sendable {
                 writeBytesPerSecond: nil,
                 readBytes24h: nil,
                 writeBytes24h: nil,
-                sourceDescription: "System I/O estimate unavailable in v1 collector"
+                sourceDescription: ioTotals == nil ? "Disk I/O counters unavailable" : "IORegistry disk counters",
+                totalReadBytes: ioTotals?.readBytes,
+                totalWriteBytes: ioTotals?.writeBytes
             ),
             gpu: gpuProvider()
         )
@@ -159,8 +168,71 @@ final class SystemMonitor: Sendable {
         return DiskCapacity(totalBytes: total, availableBytes: available)
     }
 
+    private static func readDiskIOTotalSnapshot() -> DiskIOTotalSnapshot? {
+        guard let matching = IOServiceMatching("IOBlockStorageDriver") else {
+            return nil
+        }
+
+        var iterator: io_iterator_t = 0
+        guard IOServiceGetMatchingServices(kIOMainPortDefault, matching, &iterator) == KERN_SUCCESS else {
+            return nil
+        }
+        defer { IOObjectRelease(iterator) }
+
+        var totalRead: UInt64 = 0
+        var totalWrite: UInt64 = 0
+        var foundCounters = false
+
+        while true {
+            let service = IOIteratorNext(iterator)
+            if service == 0 {
+                break
+            }
+            defer { IOObjectRelease(service) }
+
+            guard let property = IORegistryEntryCreateCFProperty(
+                service,
+                "Statistics" as CFString,
+                kCFAllocatorDefault,
+                0
+            )?.takeRetainedValue(),
+                  let statistics = property as? [String: Any] else {
+                continue
+            }
+
+            if let read = uint64Value(statistics["Bytes (Read)"]) {
+                totalRead += read
+                foundCounters = true
+            }
+            if let write = uint64Value(statistics["Bytes (Write)"]) {
+                totalWrite += write
+                foundCounters = true
+            }
+        }
+
+        guard foundCounters else {
+            return nil
+        }
+        return DiskIOTotalSnapshot(timestamp: Date(), readBytes: totalRead, writeBytes: totalWrite)
+    }
+
     private static func readGPUSnapshot() -> Availability<GPUSnapshot> {
         .unavailable("GPU utilization unavailable through stable public API")
+    }
+
+    private static func uint64Value(_ value: Any?) -> UInt64? {
+        switch value {
+        case let value as UInt64:
+            return value
+        case let value as UInt32:
+            return UInt64(value)
+        case let value as Int where value >= 0:
+            return UInt64(value)
+        case let value as NSNumber:
+            return value.uint64Value
+        default:
+            return nil
+        }
     }
 }
 

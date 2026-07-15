@@ -11,10 +11,11 @@ struct CodexQuotaSnapshot: Equatable {
     var planType: String?
     var creditsDescription: String
     var individualLimitDescription: String
+    var extraQuotaDescription: String = "Not reported"
     var rateLimitReachedType: String?
 
     static let unavailable = CodexQuotaSnapshot(
-        sourceDescription: "local Codex log signal",
+        sourceDescription: "No local quota event found",
         freshness: nil,
         limitID: nil,
         usedPercent: nil,
@@ -24,6 +25,7 @@ struct CodexQuotaSnapshot: Equatable {
         planType: nil,
         creditsDescription: "Not reported",
         individualLimitDescription: "Not reported",
+        extraQuotaDescription: "Not reported",
         rateLimitReachedType: nil
     )
 }
