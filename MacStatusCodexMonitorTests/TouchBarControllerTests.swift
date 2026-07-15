@@ -4,7 +4,7 @@ import XCTest
 
 @MainActor
 final class TouchBarControllerTests: XCTestCase {
-    func testTouchBarItemsStartUnavailableThenRefreshLiveValues() async {
+    func testTouchBarUsesPersistentPrincipalStatusStripWithColoredProgress() async {
         let initialSystem = SystemSnapshot(
             timestamp: Date(timeIntervalSince1970: 10),
             cpuUsage: 42,
@@ -69,6 +69,7 @@ final class TouchBarControllerTests: XCTestCase {
         let state = AppState(
             systemMonitor: StubTouchBarSystemMonitor(snapshots: [initialSystem, refreshedSystem]),
             diskStore: StubTouchBarDiskGrowthStore(growthSummaries: [initialDiskGrowth, refreshedDiskGrowth]),
+            cacheStore: StubTouchBarCacheGrowthStore(),
             cacheAnalyzer: StubTouchBarCacheAnalyzer(),
             codexReader: StubTouchBarCodexQuotaReader(result: quota),
             refreshQueue: DispatchQueue(label: "TouchBarControllerTests.refresh")
@@ -77,40 +78,74 @@ final class TouchBarControllerTests: XCTestCase {
         let controller = TouchBarController(state: state)
         let touchBar = controller.makeTouchBar()
 
-        let cpuItem = controller.touchBar(touchBar, makeItemForIdentifier: TouchBarController.cpu) as? NSCustomTouchBarItem
-        let memoryItem = controller.touchBar(touchBar, makeItemForIdentifier: TouchBarController.memory) as? NSCustomTouchBarItem
-        let diskItem = controller.touchBar(touchBar, makeItemForIdentifier: TouchBarController.disk) as? NSCustomTouchBarItem
-        let batteryItem = controller.touchBar(touchBar, makeItemForIdentifier: TouchBarController.battery) as? NSCustomTouchBarItem
-        let codexItem = controller.touchBar(touchBar, makeItemForIdentifier: TouchBarController.codex) as? NSCustomTouchBarItem
+        XCTAssertEqual(touchBar.principalItemIdentifier, TouchBarController.statusStrip)
+        XCTAssertEqual(touchBar.defaultItemIdentifiers, [TouchBarController.statusStrip])
+        XCTAssertEqual(touchBar.customizationRequiredItemIdentifiers, [TouchBarController.statusStrip])
 
-        XCTAssertEqual((cpuItem?.view as? NSTextField)?.stringValue, "CPU 42%")
-        XCTAssertEqual((memoryItem?.view as? NSTextField)?.stringValue, "Mem 67%")
-        XCTAssertEqual((diskItem?.view as? NSTextField)?.stringValue, "Disk Learning")
-        XCTAssertEqual((batteryItem?.view as? NSTextField)?.stringValue, "Batt 88%")
-        XCTAssertEqual((codexItem?.view as? NSTextField)?.stringValue, "Codex Not reported")
+        let item = controller.touchBar(touchBar, makeItemForIdentifier: TouchBarController.statusStrip) as? NSCustomTouchBarItem
+        let strip = item?.view as? TouchBarStatusStripView
+
+        XCTAssertEqual(strip?.labelText(for: .cpu), "CPU 42%")
+        XCTAssertEqual(strip?.labelText(for: .memory), "Mem 67%")
+        XCTAssertEqual(strip?.labelText(for: .disk), "Disk Learning")
+        XCTAssertEqual(strip?.labelText(for: .battery), "Batt 88%")
+        XCTAssertEqual(strip?.labelText(for: .codex), "Codex Not reported")
+        assertProgress(strip, .cpu, equals: 0.42)
+        assertProgress(strip, .memory, equals: 0.67)
+        assertProgress(strip, .battery, equals: 0.88)
+        XCTAssertEqual(strip?.barColor(for: .cpu), NSColor.systemBlue)
+        XCTAssertEqual(strip?.barColor(for: .memory), NSColor.systemTeal)
+        XCTAssertEqual(strip?.barColor(for: .codex), NSColor.systemRed)
 
         state.refresh()
 
-        await waitForLabel(codexItem?.view as? NSTextField, toEqual: "Codex 75%")
+        await waitForLabel(in: strip, metric: .codex, toEqual: "Codex 75%")
 
-        XCTAssertEqual((cpuItem?.view as? NSTextField)?.stringValue, "CPU 84%")
-        XCTAssertEqual((memoryItem?.view as? NSTextField)?.stringValue, "Mem 73%")
-        XCTAssertEqual((diskItem?.view as? NSTextField)?.stringValue, "Disk +1.5 KB")
-        XCTAssertEqual((batteryItem?.view as? NSTextField)?.stringValue, "Batt 91%")
+        XCTAssertEqual(strip?.labelText(for: .cpu), "CPU 84%")
+        XCTAssertEqual(strip?.labelText(for: .memory), "Mem 73%")
+        XCTAssertEqual(strip?.labelText(for: .disk), "Disk +1.5 KB")
+        XCTAssertEqual(strip?.labelText(for: .battery), "Batt 91%")
+        assertProgress(strip, .cpu, equals: 0.84)
+        assertProgress(strip, .memory, equals: 0.73)
+        assertProgress(strip, .disk, equals: 0.015)
+        assertProgress(strip, .battery, equals: 0.91)
+        assertProgress(strip, .codex, equals: 0.75)
+        XCTAssertEqual(strip?.barColor(for: .battery), NSColor.systemGreen)
+        XCTAssertEqual(strip?.barColor(for: .codex), NSColor.systemPurple)
     }
 
-    private func waitForLabel(_ label: NSTextField?, toEqual expected: String, timeout: TimeInterval = 2.0) async {
+    private func assertProgress(
+        _ strip: TouchBarStatusStripView?,
+        _ metric: TouchBarMetric,
+        equals expected: Double,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        guard let actual = strip?.progress(for: metric) else {
+            XCTFail("Missing progress for \(metric)", file: file, line: line)
+            return
+        }
+
+        XCTAssertEqual(actual, expected, accuracy: 0.001, file: file, line: line)
+    }
+
+    private func waitForLabel(
+        in strip: TouchBarStatusStripView?,
+        metric: TouchBarMetric,
+        toEqual expected: String,
+        timeout: TimeInterval = 2.0
+    ) async {
         let timeoutNanoseconds = UInt64(timeout * 1_000_000_000)
         let start = DispatchTime.now().uptimeNanoseconds
 
         while DispatchTime.now().uptimeNanoseconds - start < timeoutNanoseconds {
-            if label?.stringValue == expected {
+            if strip?.labelText(for: metric) == expected {
                 return
             }
             try? await Task.sleep(nanoseconds: 10_000_000)
         }
 
-        XCTFail("Timed out waiting for label to become \(expected). Current value: \(label?.stringValue ?? "nil")")
+        XCTFail("Timed out waiting for label to become \(expected). Current value: \(strip?.labelText(for: metric) ?? "nil")")
     }
 }
 
@@ -137,6 +172,20 @@ private final class StubTouchBarDiskGrowthStore: DiskGrowthStoring {
 
     func growthSummary(now: Date) -> DiskGrowthSummary {
         growthSummaries.withLock { $0.removeFirst() }
+    }
+}
+
+private struct StubTouchBarCacheGrowthStore: CacheGrowthStoring {
+    func record(_ snapshot: CacheSnapshot) throws {}
+
+    func summary(now: Date) -> CacheGrowthSummary {
+        CacheGrowthSummary(
+            latest: nil,
+            baseline: nil,
+            growthBytes: nil,
+            observedHours: 0,
+            statusText: "none"
+        )
     }
 }
 
