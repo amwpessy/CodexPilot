@@ -6,6 +6,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var state: AppState?
     private let scheduler: MonitoringScheduler
     private let statusTitleSink: ((String) -> Void)?
+    private let appActivationSink: (() -> Void)?
     private var statusItem: NSStatusItem?
     private var popover: NSPopover?
     private var dashboardWindow: NSWindow?
@@ -17,16 +18,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         self.state = nil
         self.scheduler = MonitoringScheduler()
         self.statusTitleSink = nil
+        self.appActivationSink = nil
         super.init()
     }
 
     @MainActor
     init(state: AppState,
          scheduler: MonitoringScheduler = MonitoringScheduler(),
-         statusTitleSink: ((String) -> Void)? = nil) {
+         statusTitleSink: ((String) -> Void)? = nil,
+         appActivationSink: (() -> Void)? = nil) {
         self.state = state
         self.scheduler = scheduler
         self.statusTitleSink = statusTitleSink
+        self.appActivationSink = appActivationSink
         super.init()
     }
 
@@ -69,7 +73,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         dashboardWindow?.center()
         dashboardWindow?.makeKeyAndOrderFront(nil)
-        NSApp.activate(ignoringOtherApps: true)
+        activateApp()
     }
 
     @MainActor
@@ -139,7 +143,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if popover.isShown {
             popover.performClose(nil)
         } else {
+            activateApp()
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+        }
+    }
+
+    @MainActor
+    private func activateApp() {
+        if let appActivationSink {
+            appActivationSink()
+        } else {
+            NSApp.activate(ignoringOtherApps: true)
         }
     }
 

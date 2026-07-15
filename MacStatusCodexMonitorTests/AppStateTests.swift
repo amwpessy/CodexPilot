@@ -1,8 +1,51 @@
+import AppKit
 import XCTest
 @testable import MacStatusCodexMonitor
 
 @MainActor
 final class AppStateTests: XCTestCase {
+    func testMenuBarClickActivatesAppWhenOpeningPopover() {
+        let activated = expectation(description: "activated")
+        let state = AppState(
+            systemMonitor: StubSystemMonitor(snapshots: [
+                makeSystemSnapshot(timestamp: Date(timeIntervalSince1970: 10), cpuUsage: 10)
+            ]),
+            diskStore: StubDiskGrowthStore(
+                growthSummary: DiskGrowthSummary(latest: nil, baseline: nil, growthBytes: nil, observedHours: 0, statusText: "none")
+            ),
+            cacheStore: StubCacheGrowthStore(summaryResult: CacheGrowthSummary(
+                latest: nil,
+                baseline: nil,
+                growthBytes: nil,
+                observedHours: 0,
+                statusText: "cache"
+            )),
+            cacheAnalyzer: StubCacheAnalyzer(result: CacheEstimate(totalBytes: 0, entries: [], scannedAt: Date(), statusText: "none")),
+            codexReader: StubCodexQuotaReader(result: CodexQuotaSnapshot(
+                sourceDescription: "Not reported",
+                freshness: nil,
+                limitID: nil,
+                usedPercent: nil,
+                remainingPercent: nil,
+                resetsAt: nil,
+                windowMinutes: nil,
+                planType: nil,
+                creditsDescription: "Not reported",
+                individualLimitDescription: "Not reported",
+                rateLimitReachedType: nil
+            ))
+        )
+        let delegate = AppDelegate(state: state, appActivationSink: {
+            activated.fulfill()
+        })
+
+        delegate.applicationDidFinishLaunching(Notification(name: NSApplication.didFinishLaunchingNotification))
+        delegate.perform(NSSelectorFromString("togglePopover"))
+
+        wait(for: [activated], timeout: 1.0)
+        delegate.applicationWillTerminate(Notification(name: NSApplication.willTerminateNotification))
+    }
+
     func testAppDelegateUpdatesMenuBarTitleAfterAsyncRefreshPublishes() async {
         let refreshedSnapshot = makeSystemSnapshot(timestamp: Date(timeIntervalSince1970: 20), cpuUsage: 40)
         let refreshedQuota = CodexQuotaSnapshot(
