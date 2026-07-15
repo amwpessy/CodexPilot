@@ -39,10 +39,9 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         let touchBar = NSTouchBar()
         touchBar.delegate = self
         touchBar.customizationIdentifier = "local.MacStatusCodexMonitor.touchbar"
-        touchBar.defaultItemIdentifiers = [Self.statusStrip]
-        touchBar.customizationAllowedItemIdentifiers = [Self.statusStrip]
+        touchBar.defaultItemIdentifiers = [Self.statusStrip, .flexibleSpace]
+        touchBar.customizationAllowedItemIdentifiers = [Self.statusStrip, .flexibleSpace]
         touchBar.customizationRequiredItemIdentifiers = [Self.statusStrip]
-        touchBar.principalItemIdentifier = Self.statusStrip
         return touchBar
     }
 

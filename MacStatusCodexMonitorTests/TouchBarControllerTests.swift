@@ -78,8 +78,8 @@ final class TouchBarControllerTests: XCTestCase {
         let controller = TouchBarController(state: state)
         let touchBar = controller.makeTouchBar()
 
-        XCTAssertEqual(touchBar.principalItemIdentifier, TouchBarController.statusStrip)
-        XCTAssertEqual(touchBar.defaultItemIdentifiers, [TouchBarController.statusStrip])
+        XCTAssertNil(touchBar.principalItemIdentifier)
+        XCTAssertEqual(touchBar.defaultItemIdentifiers, [TouchBarController.statusStrip, .flexibleSpace])
         XCTAssertEqual(touchBar.customizationRequiredItemIdentifiers, [TouchBarController.statusStrip])
 
         let item = controller.touchBar(touchBar, makeItemForIdentifier: TouchBarController.statusStrip) as? NSCustomTouchBarItem

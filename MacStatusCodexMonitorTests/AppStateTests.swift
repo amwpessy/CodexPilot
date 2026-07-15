@@ -43,7 +43,7 @@ final class AppStateTests: XCTestCase {
         )
         let delegate = AppDelegate(state: state, statusTitleSink: { title in
             observedTitles.append(title)
-            if title == "CPU 40% Codex 25%" {
+            if title == "CPU 40% Mem 50% Disk 70% Batt 80% Codex 25%" {
                 titleUpdated.fulfill()
             }
         })
@@ -53,7 +53,7 @@ final class AppStateTests: XCTestCase {
 
         await fulfillment(of: [titleUpdated], timeout: 2.0)
 
-        XCTAssertEqual(observedTitles.last, "CPU 40% Codex 25%")
+        XCTAssertEqual(observedTitles.last, "CPU 40% Mem 50% Disk 70% Batt 80% Codex 25%")
     }
 
     func testRefreshRunsHeavyWorkOffMainActorAndPublishesSnapshot() async {

@@ -116,11 +116,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @MainActor
     private func updateMenuBarTitle() {
         let state = ensureState()
-        let cpu = PercentFormatterUtility.string(state.system.cpuUsage)
-        let codex = PercentFormatterUtility.string(state.codexQuota.remainingPercent)
-        let title = "CPU \(cpu) Codex \(codex)"
+        let title = menuBarTitle(for: state)
         statusTitleSink?(title)
         statusItem?.button?.title = title
+    }
+
+    @MainActor
+    private func menuBarTitle(for state: AppState) -> String {
+        let cpu = PercentFormatterUtility.string(state.system.cpuUsage)
+        let memory = PercentFormatterUtility.string(state.system.memoryUsedPercent)
+        let disk = PercentFormatterUtility.string(state.system.diskCapacity.usedPercent)
+        let battery = PercentFormatterUtility.string(state.system.battery.percent)
+        let codex = PercentFormatterUtility.string(state.codexQuota.remainingPercent)
+        return "CPU \(cpu) Mem \(memory) Disk \(disk) Batt \(battery) Codex \(codex)"
     }
 
     @MainActor
