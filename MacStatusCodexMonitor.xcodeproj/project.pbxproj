@@ -13,6 +13,12 @@
 		A1B2C3D4E5F6000100000004 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000006 /* AppKit.framework */; };
 		A1B2C3D4E5F6000100000005 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000007 /* IOKit.framework */; };
 		A1B2C3D4E5F6000100000006 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000008 /* XCTest.framework */; };
+		A1B2C3D4E5F6000100000026 /* FormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600020000000A /* FormattingTests.swift */; };
+		A1B2C3D4E5F6000100000027 /* SystemSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600020000000B /* SystemSnapshot.swift */; };
+		A1B2C3D4E5F6000100000028 /* DiskSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600020000000C /* DiskSnapshot.swift */; };
+		A1B2C3D4E5F6000100000029 /* CodexQuotaSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600020000000D /* CodexQuotaSnapshot.swift */; };
+		A1B2C3D4E5F600010000002A /* ByteFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600020000000E /* ByteFormatter.swift */; };
+		A1B2C3D4E5F600010000002B /* PercentFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600020000000F /* PercentFormatter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,6 +41,12 @@
 		A1B2C3D4E5F6000200000007 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		A1B2C3D4E5F6000200000008 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = System/Library/Frameworks/XCTest.framework; sourceTree = SDKROOT; };
 		A1B2C3D4E5F6000200000009 /* MacStatusCodexMonitorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MacStatusCodexMonitorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1B2C3D4E5F600020000000A /* FormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormattingTests.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600020000000B /* SystemSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemSnapshot.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600020000000C /* DiskSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskSnapshot.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600020000000D /* CodexQuotaSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexQuotaSnapshot.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600020000000E /* ByteFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ByteFormatter.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600020000000F /* PercentFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PercentFormatter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +86,8 @@
 			children = (
 				A1B2C3D4E5F6000200000001 /* MacStatusCodexMonitorApp.swift */,
 				A1B2C3D4E5F600010000000C /* App */,
+				A1B2C3D4E5F600010000002C /* Models */,
+				A1B2C3D4E5F600010000002D /* Utilities */,
 				A1B2C3D4E5F6000200000003 /* Info.plist */,
 			);
 			path = MacStatusCodexMonitor;
@@ -90,8 +104,28 @@
 		A1B2C3D4E5F600010000000E /* MacStatusCodexMonitorTests */ = {
 			isa = PBXGroup;
 			children = (
+				A1B2C3D4E5F600020000000A /* FormattingTests.swift */,
 			);
 			path = MacStatusCodexMonitorTests;
+			sourceTree = "<group>";
+		};
+		A1B2C3D4E5F600010000002C /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D4E5F600020000000B /* SystemSnapshot.swift */,
+				A1B2C3D4E5F600020000000C /* DiskSnapshot.swift */,
+				A1B2C3D4E5F600020000000D /* CodexQuotaSnapshot.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		A1B2C3D4E5F600010000002D /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D4E5F600020000000E /* ByteFormatter.swift */,
+				A1B2C3D4E5F600020000000F /* PercentFormatter.swift */,
+			);
+			path = Utilities;
 			sourceTree = "<group>";
 		};
 		A1B2C3D4E5F600010000000F /* Frameworks */ = {
@@ -214,6 +248,11 @@
 			files = (
 				A1B2C3D4E5F6000100000001 /* MacStatusCodexMonitorApp.swift in Sources */,
 				A1B2C3D4E5F6000100000002 /* AppDelegate.swift in Sources */,
+				A1B2C3D4E5F6000100000027 /* SystemSnapshot.swift in Sources */,
+				A1B2C3D4E5F6000100000028 /* DiskSnapshot.swift in Sources */,
+				A1B2C3D4E5F6000100000029 /* CodexQuotaSnapshot.swift in Sources */,
+				A1B2C3D4E5F600010000002A /* ByteFormatter.swift in Sources */,
+				A1B2C3D4E5F600010000002B /* PercentFormatter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -221,6 +260,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1B2C3D4E5F6000100000026 /* FormattingTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
