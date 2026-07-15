@@ -1,17 +1,31 @@
+import Combine
 import AppKit
 import SwiftUI
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    private let state = AppState()
-    private let scheduler = MonitoringScheduler()
+    private let state: AppState
+    private let scheduler: MonitoringScheduler
+    private let statusTitleSink: ((String) -> Void)?
     private var statusItem: NSStatusItem?
     private var popover: NSPopover?
     private var dashboardWindow: NSWindow?
+    private var stateSubscription: AnyCancellable?
+    private var menuBarTitleUpdateScheduled = false
+
+    init(state: AppState? = nil,
+         scheduler: MonitoringScheduler = MonitoringScheduler(),
+         statusTitleSink: ((String) -> Void)? = nil) {
+        self.state = state ?? AppState()
+        self.scheduler = scheduler
+        self.statusTitleSink = statusTitleSink
+        super.init()
+    }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
         installMenuBarItem()
+        observeStateForMenuBarTitle()
         scheduler.start(interval: 30) { [weak self] in
             Task { @MainActor in
                 self?.state.refresh()
@@ -22,6 +36,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         scheduler.stop()
+        stateSubscription = nil
     }
 
     func showDashboard() {
@@ -58,10 +73,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         self.popover = popover
     }
 
+    func observeStateForMenuBarTitle() {
+        stateSubscription = state.objectWillChange.sink { [weak self] _ in
+            self?.scheduleMenuBarTitleUpdate()
+        }
+    }
+
+    private func scheduleMenuBarTitleUpdate() {
+        guard !menuBarTitleUpdateScheduled else {
+            return
+        }
+        menuBarTitleUpdateScheduled = true
+        DispatchQueue.main.async { [weak self] in
+            guard let self else {
+                return
+            }
+            self.menuBarTitleUpdateScheduled = false
+            self.updateMenuBarTitle()
+        }
+    }
+
     private func updateMenuBarTitle() {
         let cpu = PercentFormatterUtility.string(state.system.cpuUsage)
         let codex = PercentFormatterUtility.string(state.codexQuota.remainingPercent)
-        statusItem?.button?.title = "CPU \(cpu) Codex \(codex)"
+        let title = "CPU \(cpu) Codex \(codex)"
+        statusTitleSink?(title)
+        statusItem?.button?.title = title
     }
 
     @objc private func togglePopover() {

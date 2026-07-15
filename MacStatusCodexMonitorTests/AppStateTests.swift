@@ -3,6 +3,52 @@ import XCTest
 
 @MainActor
 final class AppStateTests: XCTestCase {
+    func testAppDelegateUpdatesMenuBarTitleAfterAsyncRefreshPublishes() async {
+        let refreshedSnapshot = makeSystemSnapshot(timestamp: Date(timeIntervalSince1970: 20), cpuUsage: 40)
+        let refreshedQuota = CodexQuotaSnapshot(
+            sourceDescription: "local",
+            freshness: refreshedSnapshot.timestamp,
+            limitID: "codex",
+            usedPercent: 75,
+            remainingPercent: 25,
+            resetsAt: nil,
+            windowMinutes: 60,
+            planType: "team",
+            creditsDescription: "Credits available",
+            individualLimitDescription: "Not reported",
+            rateLimitReachedType: nil
+        )
+        let titleUpdated = expectation(description: "titleUpdated")
+        var observedTitles: [String] = []
+
+        let state = AppState(
+            systemMonitor: StubSystemMonitor(
+                snapshots: [
+                    makeSystemSnapshot(timestamp: Date(timeIntervalSince1970: 10), cpuUsage: 10),
+                    refreshedSnapshot
+                ]
+            ),
+            diskStore: StubDiskGrowthStore(
+                growthSummary: DiskGrowthSummary(latest: nil, baseline: nil, growthBytes: nil, observedHours: 0, statusText: "none")
+            ),
+            cacheAnalyzer: StubCacheAnalyzer(result: CacheEstimate(totalBytes: 0, entries: [], scannedAt: Date(), statusText: "none")),
+            codexReader: StubCodexQuotaReader(result: refreshedQuota)
+        )
+        let delegate = AppDelegate(state: state, statusTitleSink: { title in
+            observedTitles.append(title)
+            if title == "CPU 40% Codex 25%" {
+                titleUpdated.fulfill()
+            }
+        })
+
+        delegate.observeStateForMenuBarTitle()
+        state.refresh()
+
+        await fulfillment(of: [titleUpdated], timeout: 2.0)
+
+        XCTAssertEqual(observedTitles.last, "CPU 40% Codex 25%")
+    }
+
     func testRefreshRunsHeavyWorkOffMainActorAndPublishesSnapshot() async {
         let workRanOffMainActor = expectation(description: "workRanOffMainActor")
         workRanOffMainActor.expectedFulfillmentCount = 4
