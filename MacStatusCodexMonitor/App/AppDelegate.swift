@@ -2,9 +2,8 @@ import Combine
 import AppKit
 import SwiftUI
 
-@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    private let state: AppState
+    private var state: AppState?
     private let scheduler: MonitoringScheduler
     private let statusTitleSink: ((String) -> Void)?
     private var statusItem: NSStatusItem?
@@ -14,36 +13,49 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var stateSubscription: AnyCancellable?
     private var menuBarTitleUpdateScheduled = false
 
-    init(state: AppState? = nil,
+    override init() {
+        self.state = nil
+        self.scheduler = MonitoringScheduler()
+        self.statusTitleSink = nil
+        super.init()
+    }
+
+    @MainActor
+    init(state: AppState,
          scheduler: MonitoringScheduler = MonitoringScheduler(),
          statusTitleSink: ((String) -> Void)? = nil) {
-        self.state = state ?? AppState()
+        self.state = state
         self.scheduler = scheduler
         self.statusTitleSink = statusTitleSink
         super.init()
     }
 
+    @MainActor
     func applicationDidFinishLaunching(_ notification: Notification) {
+        let state = ensureState()
         NSApp.setActivationPolicy(.accessory)
-        installMenuBarItem()
+        installMenuBarItem(state: state)
         let touchController = TouchBarController(state: state)
         touchBarController = touchController
         NSApp.touchBar = touchController.makeTouchBar()
         observeStateForMenuBarTitle()
         scheduler.start(interval: 30) { [weak self] in
             Task { @MainActor in
-                self?.state.refresh()
+                self?.ensureState().refresh()
                 self?.updateMenuBarTitle()
             }
         }
     }
 
+    @MainActor
     func applicationWillTerminate(_ notification: Notification) {
         scheduler.stop()
         stateSubscription = nil
     }
 
+    @MainActor
     func showDashboard() {
+        let state = ensureState()
         if dashboardWindow == nil {
             let window = NSWindow(
                 contentRect: NSRect(x: 0, y: 0, width: 860, height: 640),
@@ -60,7 +72,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.activate(ignoringOtherApps: true)
     }
 
-    private func installMenuBarItem() {
+    @MainActor
+    private func installMenuBarItem(state: AppState) {
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         item.button?.target = self
         item.button?.action = #selector(togglePopover)
@@ -77,12 +90,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         self.popover = popover
     }
 
+    @MainActor
     func observeStateForMenuBarTitle() {
+        let state = ensureState()
         stateSubscription = state.objectWillChange.sink { [weak self] _ in
             self?.scheduleMenuBarTitleUpdate()
         }
     }
 
+    @MainActor
     private func scheduleMenuBarTitleUpdate() {
         guard !menuBarTitleUpdateScheduled else {
             return
@@ -97,7 +113,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    @MainActor
     private func updateMenuBarTitle() {
+        let state = ensureState()
         let cpu = PercentFormatterUtility.string(state.system.cpuUsage)
         let codex = PercentFormatterUtility.string(state.codexQuota.remainingPercent)
         let title = "CPU \(cpu) Codex \(codex)"
@@ -105,6 +123,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem?.button?.title = title
     }
 
+    @MainActor
     @objc private func togglePopover() {
         guard let button = statusItem?.button, let popover else {
             return
@@ -114,5 +133,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         } else {
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
         }
+    }
+
+    @MainActor
+    private func ensureState() -> AppState {
+        if let state {
+            return state
+        }
+        let newState = AppState()
+        state = newState
+        return newState
     }
 }
