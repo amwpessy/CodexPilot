@@ -46,7 +46,7 @@ final class AppStateTests: XCTestCase {
         delegate.applicationWillTerminate(Notification(name: NSApplication.willTerminateNotification))
     }
 
-    func testAppDelegateUpdatesMenuBarTitleAfterAsyncRefreshPublishes() async {
+    func testAppDelegateUpdatesMenuBarTitleWithSingleMetricProgressAfterAsyncRefreshPublishes() async {
         let refreshedSnapshot = makeSystemSnapshot(timestamp: Date(timeIntervalSince1970: 20), cpuUsage: 40)
         let refreshedQuota = CodexQuotaSnapshot(
             sourceDescription: "local",
@@ -86,7 +86,7 @@ final class AppStateTests: XCTestCase {
         )
         let delegate = AppDelegate(state: state, statusTitleSink: { title in
             observedTitles.append(title)
-            if title == "CPU 40% Mem 50% Disk 70% Batt 80% Codex 25%" {
+            if title == "CPU ▰▰▱▱▱ 40%" {
                 titleUpdated.fulfill()
             }
         })
@@ -96,7 +96,57 @@ final class AppStateTests: XCTestCase {
 
         await fulfillment(of: [titleUpdated], timeout: 2.0)
 
-        XCTAssertEqual(observedTitles.last, "CPU 40% Mem 50% Disk 70% Batt 80% Codex 25%")
+        XCTAssertEqual(observedTitles.last, "CPU ▰▰▱▱▱ 40%")
+    }
+
+    func testMenuBarTitleRotatesOneMetricAtATime() {
+        let titleUpdated = expectation(description: "titleUpdated")
+        titleUpdated.expectedFulfillmentCount = 2
+        var observedTitles: [String] = []
+
+        let state = AppState(
+            systemMonitor: StubSystemMonitor(snapshots: [
+                makeSystemSnapshot(timestamp: Date(timeIntervalSince1970: 10), cpuUsage: 40)
+            ]),
+            diskStore: StubDiskGrowthStore(
+                growthSummary: DiskGrowthSummary(latest: nil, baseline: nil, growthBytes: nil, observedHours: 0, statusText: "none")
+            ),
+            cacheStore: StubCacheGrowthStore(summaryResult: CacheGrowthSummary(
+                latest: nil,
+                baseline: nil,
+                growthBytes: nil,
+                observedHours: 0,
+                statusText: "cache"
+            )),
+            cacheAnalyzer: StubCacheAnalyzer(result: CacheEstimate(totalBytes: 0, entries: [], scannedAt: Date(), statusText: "none")),
+            codexReader: StubCodexQuotaReader(result: CodexQuotaSnapshot(
+                sourceDescription: "local",
+                freshness: Date(timeIntervalSince1970: 10),
+                limitID: "codex",
+                usedPercent: 75,
+                remainingPercent: 25,
+                resetsAt: nil,
+                windowMinutes: 60,
+                planType: "team",
+                creditsDescription: "Credits available",
+                individualLimitDescription: "Not reported",
+                rateLimitReachedType: nil
+            ))
+        )
+        let delegate = AppDelegate(state: state, statusTitleSink: { title in
+            observedTitles.append(title)
+            if title == "CPU ▰▰▱▱▱ 40%" || title == "Mem ▰▰▰▱▱ 50%" {
+                titleUpdated.fulfill()
+            }
+        })
+
+        delegate.applicationDidFinishLaunching(Notification(name: NSApplication.didFinishLaunchingNotification))
+        delegate.advanceMenuBarStatusMetric()
+
+        wait(for: [titleUpdated], timeout: 1.0)
+
+        XCTAssertEqual(observedTitles.suffix(2), ["CPU ▰▰▱▱▱ 40%", "Mem ▰▰▰▱▱ 50%"])
+        delegate.applicationWillTerminate(Notification(name: NSApplication.willTerminateNotification))
     }
 
     func testRefreshRunsHeavyWorkOffMainActorAndPublishesSnapshot() async {

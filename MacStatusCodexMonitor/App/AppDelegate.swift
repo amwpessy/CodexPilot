@@ -12,6 +12,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var dashboardWindow: NSWindow?
     private var touchBarController: TouchBarController?
     private var stateSubscription: AnyCancellable?
+    private var menuBarRotationTimer: Timer?
+    private var menuBarMetricIndex = 0
     private var menuBarTitleUpdateScheduled = false
 
     override init() {
@@ -43,6 +45,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         touchBarController = touchController
         NSApp.touchBar = touchController.makeTouchBar()
         observeStateForMenuBarTitle()
+        startMenuBarRotationTimer()
         scheduler.start(interval: 120) { [weak self] in
             Task { @MainActor in
                 self?.ensureState().refresh()
@@ -54,6 +57,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @MainActor
     func applicationWillTerminate(_ notification: Notification) {
         scheduler.stop()
+        menuBarRotationTimer?.invalidate()
+        menuBarRotationTimer = nil
         stateSubscription = nil
     }
 
@@ -103,6 +108,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @MainActor
+    func advanceMenuBarStatusMetric() {
+        let metrics = menuBarStatusMetrics(for: ensureState())
+        guard !metrics.isEmpty else {
+            return
+        }
+        menuBarMetricIndex = (menuBarMetricIndex + 1) % metrics.count
+        updateMenuBarTitle()
+    }
+
+    @MainActor
     private func scheduleMenuBarTitleUpdate() {
         guard !menuBarTitleUpdateScheduled else {
             return
@@ -127,12 +142,40 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @MainActor
     private func menuBarTitle(for state: AppState) -> String {
-        let cpu = PercentFormatterUtility.string(state.system.cpuUsage)
-        let memory = PercentFormatterUtility.string(state.system.memoryUsedPercent)
-        let disk = PercentFormatterUtility.string(state.system.diskCapacity.usedPercent)
-        let battery = PercentFormatterUtility.string(state.system.battery.percent)
-        let codex = PercentFormatterUtility.string(state.codexQuota.remainingPercent)
-        return "CPU \(cpu) Mem \(memory) Disk \(disk) Batt \(battery) Codex \(codex)"
+        let metrics = menuBarStatusMetrics(for: state)
+        let index = min(menuBarMetricIndex, metrics.count - 1)
+        let metric = metrics[index]
+        return "\(metric.label) \(progressBar(percent: metric.percent)) \(PercentFormatterUtility.string(metric.percent))"
+    }
+
+    @MainActor
+    private func menuBarStatusMetrics(for state: AppState) -> [(label: String, percent: Double?)] {
+        [
+            ("CPU", state.system.cpuUsage),
+            ("Mem", state.system.memoryUsedPercent),
+            ("Disk", state.system.diskCapacity.usedPercent),
+            ("Batt", state.system.battery.percent),
+            ("Codex", state.codexQuota.remainingPercent)
+        ]
+    }
+
+    @MainActor
+    private func progressBar(percent: Double?) -> String {
+        guard let percent else {
+            return "▱▱▱▱▱"
+        }
+        let filled = Int((min(max(percent, 0), 100) / 20).rounded(.toNearestOrAwayFromZero))
+        return String(repeating: "▰", count: filled) + String(repeating: "▱", count: 5 - filled)
+    }
+
+    @MainActor
+    private func startMenuBarRotationTimer() {
+        menuBarRotationTimer?.invalidate()
+        menuBarRotationTimer = Timer.scheduledTimer(withTimeInterval: 4, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                self?.advanceMenuBarStatusMetric()
+            }
+        }
     }
 
     @MainActor
