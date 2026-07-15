@@ -35,3 +35,29 @@
 
 - Automated XCTest execution is still blocked by the sandboxed environment even though compile/build verification succeeded.
 - Touch Bar UI behavior on actual hardware was not interactively verified in this environment.
+
+---
+
+## Task 7 review fix: test lifecycle correction
+
+### What I fixed
+
+- Updated `TouchBarControllerTests` to match the real `AppState` lifecycle instead of assuming the Codex quota reader has already populated state during initialization.
+- Changed the regression to assert the initial Touch Bar labels first, including `Codex Not reported` and `Disk Learning`.
+- Exercised the live update path by calling `state.refresh()`, waiting for the Touch Bar labels to change, and then asserting the refreshed CPU, memory, disk, battery, and Codex values.
+- Reworked the test doubles to provide sequential system and disk-growth snapshots so the test proves `TouchBarController` responds to `state.objectWillChange` updates.
+
+### Tests/builds run and results
+
+- `/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild build-for-testing -project MacStatusCodexMonitor.xcodeproj -scheme MacStatusCodexMonitor -destination 'platform=macOS' -derivedDataPath .derivedData-task7-fix`
+  - Result: PASS
+- `/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild build -project MacStatusCodexMonitor.xcodeproj -scheme MacStatusCodexMonitor -destination 'platform=macOS' -derivedDataPath .derivedData-task7-build-fix`
+  - Result: PASS
+- `/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test -project MacStatusCodexMonitor.xcodeproj -scheme MacStatusCodexMonitor -destination 'platform=macOS' -derivedDataPath .derivedData-task7-fix -only-testing:MacStatusCodexMonitorTests/TouchBarControllerTests`
+  - Result: FAIL in sandboxed runtime startup
+  - Exact failure: `The connection to service named com.apple.testmanagerd.control was invalidated: Connection init failed at lookup with error 159 - Sandbox restriction.`
+
+### Files changed
+
+- `MacStatusCodexMonitorTests/TouchBarControllerTests.swift`
+- `.superpowers/sdd/task-7-report.md`
