@@ -78,8 +78,8 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
                 color: .systemTeal
             ),
             .disk: TouchBarMetricSnapshot(
-                text: diskText,
-                progress: diskProgress,
+                text: "Disk \(PercentFormatterUtility.string(state.system.diskCapacity.usedPercent))",
+                progress: progressPercent(state.system.diskCapacity.usedPercent),
                 color: diskColor
             ),
             .battery: TouchBarMetricSnapshot(
@@ -95,26 +95,15 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         ]
     }
 
-    private var diskText: String {
-        if let growth = state.diskGrowth.growthBytes {
-            return "Disk \(ByteFormatterUtility.signedString(bytes: growth))"
-        }
-        return "Disk Learning"
-    }
-
-    private var diskProgress: Double {
-        guard let growth = state.diskGrowth.growthBytes else {
-            return 0
-        }
-        let scale = 100.0 * 1_024.0
-        return min(abs(Double(growth)) / scale, 1)
-    }
-
     private var diskColor: NSColor {
-        guard let growth = state.diskGrowth.growthBytes else {
-            return .secondaryLabelColor
+        let used = state.system.diskCapacity.usedPercent
+        if used >= 90 {
+            return .systemRed
         }
-        return growth > 0 ? .systemOrange : .systemGreen
+        if used >= 75 {
+            return .systemOrange
+        }
+        return .systemGreen
     }
 
     private var batteryColor: NSColor {

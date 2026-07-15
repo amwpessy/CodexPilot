@@ -87,7 +87,7 @@ final class TouchBarControllerTests: XCTestCase {
 
         XCTAssertEqual(strip?.labelText(for: .cpu), "CPU 42%")
         XCTAssertEqual(strip?.labelText(for: .memory), "Mem 67%")
-        XCTAssertEqual(strip?.labelText(for: .disk), "Disk Learning")
+        XCTAssertEqual(strip?.labelText(for: .disk), "Disk 70%")
         XCTAssertEqual(strip?.labelText(for: .battery), "Batt 88%")
         XCTAssertEqual(strip?.labelText(for: .codex), "Codex Not reported")
         assertProgress(strip, .cpu, equals: 0.42)
@@ -103,11 +103,11 @@ final class TouchBarControllerTests: XCTestCase {
 
         XCTAssertEqual(strip?.labelText(for: .cpu), "CPU 84%")
         XCTAssertEqual(strip?.labelText(for: .memory), "Mem 73%")
-        XCTAssertEqual(strip?.labelText(for: .disk), "Disk +1.5 KB")
+        XCTAssertEqual(strip?.labelText(for: .disk), "Disk 80%")
         XCTAssertEqual(strip?.labelText(for: .battery), "Batt 91%")
         assertProgress(strip, .cpu, equals: 0.84)
         assertProgress(strip, .memory, equals: 0.73)
-        assertProgress(strip, .disk, equals: 0.015)
+        assertProgress(strip, .disk, equals: 0.8)
         assertProgress(strip, .battery, equals: 0.91)
         assertProgress(strip, .codex, equals: 0.75)
         XCTAssertEqual(strip?.barColor(for: .battery), NSColor.systemGreen)

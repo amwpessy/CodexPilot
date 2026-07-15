@@ -10,7 +10,7 @@ struct MenuBarPopoverView: View {
             Text("Mac Status & Codex").font(.headline)
             Text("CPU \(PercentFormatterUtility.string(state.system.cpuUsage))")
             Text("Mem \(PercentFormatterUtility.string(state.system.memoryUsedPercent))")
-            Text("Disk \(diskGrowthValue)")
+            Text("Disk \(PercentFormatterUtility.string(state.system.diskCapacity.usedPercent))")
             Text("Codex \(PercentFormatterUtility.string(state.codexQuota.remainingPercent)) left")
             Divider()
             Button("Open Dashboard", action: openDashboard)
@@ -18,12 +18,5 @@ struct MenuBarPopoverView: View {
         }
         .padding(14)
         .frame(width: 260)
-    }
-
-    private var diskGrowthValue: String {
-        guard let growth = state.diskGrowth.growthBytes else {
-            return "Learning"
-        }
-        return ByteFormatterUtility.signedString(bytes: growth)
     }
 }
