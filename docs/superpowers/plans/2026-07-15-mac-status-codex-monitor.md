@@ -62,7 +62,6 @@ Create:
 - Create: `MacStatusCodexMonitor/Info.plist`
 - Create: `MacStatusCodexMonitor/MacStatusCodexMonitorApp.swift`
 - Create: `MacStatusCodexMonitor/App/AppDelegate.swift`
-- Create: `MacStatusCodexMonitorTests/PlaceholderTests.swift`
 
 **Interfaces:**
 - Produces: `MacStatusCodexMonitorApp`, `AppDelegate`, one app target named `MacStatusCodexMonitor`, one test target named `MacStatusCodexMonitorTests`.
@@ -128,17 +127,7 @@ Create `MacStatusCodexMonitor/Info.plist`:
 </plist>
 ```
 
-Create `MacStatusCodexMonitorTests/PlaceholderTests.swift`:
-
-```swift
-import XCTest
-
-final class PlaceholderTests: XCTestCase {
-    func testProjectLoads() {
-        XCTAssertTrue(true)
-    }
-}
-```
+Create the `MacStatusCodexMonitorTests` directory for the future XCTest target. Do not add a placeholder test; Task 2 adds the first behavior-checking tests.
 
 - [ ] **Step 2: Create `project.pbxproj`**
 
