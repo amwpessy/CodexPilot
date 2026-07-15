@@ -32,6 +32,8 @@
 		A1B2C3D4E5F6000100000039 /* MetricTile.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600020000001A /* MetricTile.swift */; };
 		A1B2C3D4E5F600010000003A /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600020000001B /* DashboardView.swift */; };
 		A1B2C3D4E5F600010000003B /* MenuBarPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600020000001C /* MenuBarPopoverView.swift */; };
+		A1B2C3D4E5F600010000003D /* TouchBarControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600020000001D /* TouchBarControllerTests.swift */; };
+		A1B2C3D4E5F600010000003E /* TouchBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600020000001E /* TouchBarController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,6 +75,8 @@
 		A1B2C3D4E5F600020000001A /* MetricTile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricTile.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F600020000001B /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F600020000001C /* MenuBarPopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarPopoverView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600020000001D /* TouchBarControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchBarControllerTests.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600020000001E /* TouchBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchBarController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,6 +118,7 @@
 				A1B2C3D4E5F600010000000C /* App */,
 				A1B2C3D4E5F600010000002C /* Models */,
 				A1B2C3D4E5F600010000002F /* Monitors */,
+				A1B2C3D4E5F600010000003F /* TouchBar */,
 				A1B2C3D4E5F600010000002D /* Utilities */,
 				A1B2C3D4E5F600010000003C /* Views */,
 				A1B2C3D4E5F6000200000003 /* Info.plist */,
@@ -139,6 +144,7 @@
 				A1B2C3D4E5F6000200000014 /* DiskGrowthStoreTests.swift */,
 				A1B2C3D4E5F6000200000018 /* SystemMonitorTests.swift */,
 				A1B2C3D4E5F6000200000019 /* AppStateTests.swift */,
+				A1B2C3D4E5F600020000001D /* TouchBarControllerTests.swift */,
 			);
 			path = MacStatusCodexMonitorTests;
 			sourceTree = "<group>";
@@ -181,6 +187,14 @@
 				A1B2C3D4E5F600020000001C /* MenuBarPopoverView.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		A1B2C3D4E5F600010000003F /* TouchBar */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D4E5F600020000001E /* TouchBarController.swift */,
+			);
+			path = TouchBar;
 			sourceTree = "<group>";
 		};
 		A1B2C3D4E5F600010000000F /* Frameworks */ = {
@@ -317,6 +331,7 @@
 				A1B2C3D4E5F6000100000031 /* DiskGrowthStore.swift in Sources */,
 				A1B2C3D4E5F6000100000032 /* CacheAnalyzer.swift in Sources */,
 				A1B2C3D4E5F6000100000036 /* SystemMonitor.swift in Sources */,
+				A1B2C3D4E5F600010000003E /* TouchBarController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -329,6 +344,7 @@
 				A1B2C3D4E5F6000100000033 /* DiskGrowthStoreTests.swift in Sources */,
 				A1B2C3D4E5F6000100000037 /* SystemMonitorTests.swift in Sources */,
 				A1B2C3D4E5F6000100000038 /* AppStateTests.swift in Sources */,
+				A1B2C3D4E5F600010000003D /* TouchBarControllerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

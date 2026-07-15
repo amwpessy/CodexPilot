@@ -10,6 +10,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem?
     private var popover: NSPopover?
     private var dashboardWindow: NSWindow?
+    private var touchBarController: TouchBarController?
     private var stateSubscription: AnyCancellable?
     private var menuBarTitleUpdateScheduled = false
 
@@ -25,6 +26,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
         installMenuBarItem()
+        let touchController = TouchBarController(state: state)
+        touchBarController = touchController
+        NSApp.touchBar = touchController.makeTouchBar()
         observeStateForMenuBarTitle()
         scheduler.start(interval: 30) { [weak self] in
             Task { @MainActor in
