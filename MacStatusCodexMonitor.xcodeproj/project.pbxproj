@@ -1,0 +1,386 @@
+// !$*UTF8*$!
+{
+	objectVersion = 56;
+	archiveVersion = 1;
+	classes = {
+	};
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A1B2C3D4E5F6000100000001 /* MacStatusCodexMonitorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000001 /* MacStatusCodexMonitorApp.swift */; };
+		A1B2C3D4E5F6000100000002 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000002 /* AppDelegate.swift */; };
+		A1B2C3D4E5F6000100000003 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000005 /* SwiftUI.framework */; };
+		A1B2C3D4E5F6000100000004 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000006 /* AppKit.framework */; };
+		A1B2C3D4E5F6000100000005 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000007 /* IOKit.framework */; };
+		A1B2C3D4E5F6000100000006 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000008 /* XCTest.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A1B2C3D4E5F6000100000007 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A1B2C3D4E5F6000100000015 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A1B2C3D4E5F6000100000018;
+			remoteInfo = MacStatusCodexMonitor;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		A1B2C3D4E5F6000200000001 /* MacStatusCodexMonitorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacStatusCodexMonitorApp.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000200000002 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000200000003 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000200000004 /* MacStatusCodexMonitor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MacStatusCodexMonitor.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1B2C3D4E5F6000200000005 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		A1B2C3D4E5F6000200000006 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		A1B2C3D4E5F6000200000007 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		A1B2C3D4E5F6000200000008 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = System/Library/Frameworks/XCTest.framework; sourceTree = SDKROOT; };
+		A1B2C3D4E5F6000200000009 /* MacStatusCodexMonitorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MacStatusCodexMonitorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A1B2C3D4E5F6000100000008 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1B2C3D4E5F6000100000003 /* SwiftUI.framework in Frameworks */,
+				A1B2C3D4E5F6000100000004 /* AppKit.framework in Frameworks */,
+				A1B2C3D4E5F6000100000005 /* IOKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A1B2C3D4E5F6000100000009 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1B2C3D4E5F6000100000006 /* XCTest.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A1B2C3D4E5F600010000000A = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D4E5F600010000000B /* MacStatusCodexMonitor */,
+				A1B2C3D4E5F600010000000E /* MacStatusCodexMonitorTests */,
+				A1B2C3D4E5F600010000000F /* Frameworks */,
+				A1B2C3D4E5F6000100000010 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A1B2C3D4E5F600010000000B /* MacStatusCodexMonitor */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D4E5F6000200000001 /* MacStatusCodexMonitorApp.swift */,
+				A1B2C3D4E5F600010000000C /* App */,
+				A1B2C3D4E5F6000200000003 /* Info.plist */,
+			);
+			path = MacStatusCodexMonitor;
+			sourceTree = "<group>";
+		};
+		A1B2C3D4E5F600010000000C /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D4E5F6000200000002 /* AppDelegate.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		A1B2C3D4E5F600010000000E /* MacStatusCodexMonitorTests */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = MacStatusCodexMonitorTests;
+			sourceTree = "<group>";
+		};
+		A1B2C3D4E5F600010000000F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D4E5F6000200000006 /* AppKit.framework */,
+				A1B2C3D4E5F6000200000007 /* IOKit.framework */,
+				A1B2C3D4E5F6000200000005 /* SwiftUI.framework */,
+				A1B2C3D4E5F6000200000008 /* XCTest.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A1B2C3D4E5F6000100000010 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D4E5F6000200000004 /* MacStatusCodexMonitor.app */,
+				A1B2C3D4E5F6000200000009 /* MacStatusCodexMonitorTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A1B2C3D4E5F6000100000018 /* MacStatusCodexMonitor */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A1B2C3D4E5F6000100000024 /* Build configuration list for PBXNativeTarget "MacStatusCodexMonitor" */;
+			buildPhases = (
+				A1B2C3D4E5F6000100000011 /* Sources */,
+				A1B2C3D4E5F6000100000008 /* Frameworks */,
+				A1B2C3D4E5F6000100000012 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MacStatusCodexMonitor;
+			productName = MacStatusCodexMonitor;
+			productReference = A1B2C3D4E5F6000200000004 /* MacStatusCodexMonitor.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A1B2C3D4E5F6000100000019 /* MacStatusCodexMonitorTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A1B2C3D4E5F6000100000025 /* Build configuration list for PBXNativeTarget "MacStatusCodexMonitorTests" */;
+			buildPhases = (
+				A1B2C3D4E5F6000100000013 /* Sources */,
+				A1B2C3D4E5F6000100000009 /* Frameworks */,
+				A1B2C3D4E5F6000100000014 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A1B2C3D4E5F600010000001A /* PBXTargetDependency */,
+			);
+			name = MacStatusCodexMonitorTests;
+			productName = MacStatusCodexMonitorTests;
+			productReference = A1B2C3D4E5F6000200000009 /* MacStatusCodexMonitorTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A1B2C3D4E5F6000100000015 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					A1B2C3D4E5F6000100000018 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+					A1B2C3D4E5F6000100000019 = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = A1B2C3D4E5F6000100000018;
+					};
+				};
+			};
+			buildConfigurationList = A1B2C3D4E5F6000100000016 /* Build configuration list for PBXProject "MacStatusCodexMonitor" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A1B2C3D4E5F600010000000A;
+			productRefGroup = A1B2C3D4E5F6000100000010 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A1B2C3D4E5F6000100000018 /* MacStatusCodexMonitor */,
+				A1B2C3D4E5F6000100000019 /* MacStatusCodexMonitorTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A1B2C3D4E5F6000100000012 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A1B2C3D4E5F6000100000014 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A1B2C3D4E5F6000100000011 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1B2C3D4E5F6000100000001 /* MacStatusCodexMonitorApp.swift in Sources */,
+				A1B2C3D4E5F6000100000002 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A1B2C3D4E5F6000100000013 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A1B2C3D4E5F600010000001A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A1B2C3D4E5F6000100000018 /* MacStatusCodexMonitor */;
+			targetProxy = A1B2C3D4E5F6000100000007 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		A1B2C3D4E5F600010000001B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		A1B2C3D4E5F600010000001C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		A1B2C3D4E5F600010000001D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MacStatusCodexMonitor/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = local.MacStatusCodexMonitor;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		A1B2C3D4E5F600010000001E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MacStatusCodexMonitor/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = local.MacStatusCodexMonitor;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		A1B2C3D4E5F600010000001F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = local.MacStatusCodexMonitorTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = MacStatusCodexMonitor;
+			};
+			name = Debug;
+		};
+		A1B2C3D4E5F6000100000020 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = local.MacStatusCodexMonitorTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = MacStatusCodexMonitor;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A1B2C3D4E5F6000100000016 /* Build configuration list for PBXProject "MacStatusCodexMonitor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1B2C3D4E5F600010000001B /* Debug */,
+				A1B2C3D4E5F600010000001C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A1B2C3D4E5F6000100000024 /* Build configuration list for PBXNativeTarget "MacStatusCodexMonitor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1B2C3D4E5F600010000001D /* Debug */,
+				A1B2C3D4E5F600010000001E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A1B2C3D4E5F6000100000025 /* Build configuration list for PBXNativeTarget "MacStatusCodexMonitorTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1B2C3D4E5F600010000001F /* Debug */,
+				A1B2C3D4E5F6000100000020 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A1B2C3D4E5F6000100000015 /* Project object */;
+}
