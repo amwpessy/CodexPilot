@@ -21,6 +21,9 @@
 		A1B2C3D4E5F600010000002B /* PercentFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600020000000F /* PercentFormatter.swift */; };
 		A1B2C3D4E5F600010000002E /* CodexQuotaReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000010 /* CodexQuotaReaderTests.swift */; };
 		A1B2C3D4E5F6000100000030 /* CodexQuotaReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000011 /* CodexQuotaReader.swift */; };
+		A1B2C3D4E5F6000100000031 /* DiskGrowthStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000012 /* DiskGrowthStore.swift */; };
+		A1B2C3D4E5F6000100000032 /* CacheAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000013 /* CacheAnalyzer.swift */; };
+		A1B2C3D4E5F6000100000033 /* DiskGrowthStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000014 /* DiskGrowthStoreTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +54,9 @@
 		A1B2C3D4E5F600020000000F /* PercentFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PercentFormatter.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6000200000010 /* CodexQuotaReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexQuotaReaderTests.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6000200000011 /* CodexQuotaReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexQuotaReader.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000200000012 /* DiskGrowthStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskGrowthStore.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000200000013 /* CacheAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheAnalyzer.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000200000014 /* DiskGrowthStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskGrowthStoreTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,6 +117,7 @@
 			children = (
 				A1B2C3D4E5F600020000000A /* FormattingTests.swift */,
 				A1B2C3D4E5F6000200000010 /* CodexQuotaReaderTests.swift */,
+				A1B2C3D4E5F6000200000014 /* DiskGrowthStoreTests.swift */,
 			);
 			path = MacStatusCodexMonitorTests;
 			sourceTree = "<group>";
@@ -138,6 +145,8 @@
 			isa = PBXGroup;
 			children = (
 				A1B2C3D4E5F6000200000011 /* CodexQuotaReader.swift */,
+				A1B2C3D4E5F6000200000012 /* DiskGrowthStore.swift */,
+				A1B2C3D4E5F6000200000013 /* CacheAnalyzer.swift */,
 			);
 			path = Monitors;
 			sourceTree = "<group>";
@@ -268,6 +277,8 @@
 				A1B2C3D4E5F600010000002A /* ByteFormatter.swift in Sources */,
 				A1B2C3D4E5F600010000002B /* PercentFormatter.swift in Sources */,
 				A1B2C3D4E5F6000100000030 /* CodexQuotaReader.swift in Sources */,
+				A1B2C3D4E5F6000100000031 /* DiskGrowthStore.swift in Sources */,
+				A1B2C3D4E5F6000100000032 /* CacheAnalyzer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -277,6 +288,7 @@
 			files = (
 				A1B2C3D4E5F6000100000026 /* FormattingTests.swift in Sources */,
 				A1B2C3D4E5F600010000002E /* CodexQuotaReaderTests.swift in Sources */,
+				A1B2C3D4E5F6000100000033 /* DiskGrowthStoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
