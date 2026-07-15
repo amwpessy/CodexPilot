@@ -78,17 +78,14 @@ final class SystemMonitor: Sendable {
     }
 
     private func cpuUsage() -> Double? {
-        guard let current = cpuTicksProvider() else {
-            return nil
-        }
-        guard let previous = cpuTickHistory.swap(current) else {
+        guard let delta = cpuTickHistory.sampleDelta(using: cpuTicksProvider) else {
             return nil
         }
 
-        let userDelta = Double(current.user) - Double(previous.user)
-        let systemDelta = Double(current.system) - Double(previous.system)
-        let idleDelta = Double(current.idle) - Double(previous.idle)
-        let niceDelta = Double(current.nice) - Double(previous.nice)
+        let userDelta = Double(delta.current.user) - Double(delta.previous.user)
+        let systemDelta = Double(delta.current.system) - Double(delta.previous.system)
+        let idleDelta = Double(delta.current.idle) - Double(delta.previous.idle)
+        let niceDelta = Double(delta.current.nice) - Double(delta.previous.nice)
         let activeDelta = userDelta + systemDelta + niceDelta
         let totalDelta = activeDelta + idleDelta
         guard totalDelta > 0 else { return nil }
@@ -170,12 +167,18 @@ private final class LockedCPUTickHistory: @unchecked Sendable {
     private let lock = NSLock()
     private var previous: SystemMonitor.CPUTicks?
 
-    func swap(_ current: SystemMonitor.CPUTicks) -> SystemMonitor.CPUTicks? {
+    func sampleDelta(using provider: @Sendable () -> SystemMonitor.CPUTicks?) -> (previous: SystemMonitor.CPUTicks, current: SystemMonitor.CPUTicks)? {
         lock.lock()
-        defer {
-            previous = current
-            lock.unlock()
+        defer { lock.unlock() }
+
+        guard let current = provider() else {
+            return nil
         }
-        return previous
+        guard let previous else {
+            self.previous = current
+            return nil
+        }
+        self.previous = current
+        return (previous, current)
     }
 }

@@ -56,14 +56,25 @@ final class SystemMonitorTests: XCTestCase {
     }
 
     func testSnapshotSerializesCPUTickHistoryAcrossConcurrentCalls() {
-        let sampleSource = CoordinatedCPUSampleSource(samples: [
+        let metrics = LockedBox(ProviderMetrics())
+        let sampleSource = LockedBox([
             SystemMonitor.CPUTicks(user: 0, system: 0, idle: 0, nice: 0),
             SystemMonitor.CPUTicks(user: 25, system: 0, idle: 75, nice: 0),
             SystemMonitor.CPUTicks(user: 100, system: 0, idle: 100, nice: 0),
         ])
         let monitor = SystemMonitor(
             now: { Date(timeIntervalSince1970: 1_000) },
-            cpuTicksProvider: { sampleSource.next() },
+            cpuTicksProvider: {
+                metrics.withLock {
+                    $0.activeCalls += 1
+                    $0.maxConcurrentCalls = max($0.maxConcurrentCalls, $0.activeCalls)
+                }
+                usleep(50_000)
+                defer {
+                    metrics.withLock { $0.activeCalls -= 1 }
+                }
+                return sampleSource.withLock { $0.removeFirst() }
+            },
             memoryProvider: { nil },
             batteryProvider: {
                 BatterySnapshot(percent: nil, isCharging: nil, timeRemainingMinutes: nil, statusText: "No battery")
@@ -97,6 +108,7 @@ final class SystemMonitorTests: XCTestCase {
         }
         XCTAssertEqual(sortedResults[0], 25, accuracy: 0.001)
         XCTAssertEqual(sortedResults[1], 75, accuracy: 0.001)
+        XCTAssertEqual(metrics.value.maxConcurrentCalls, 1)
     }
 }
 
@@ -122,42 +134,7 @@ private final class LockedBox<Value>: @unchecked Sendable {
     }
 }
 
-private final class CoordinatedCPUSampleSource: @unchecked Sendable {
-    private let lock = NSLock()
-    private let releaseConcurrentReaders = DispatchSemaphore(value: 0)
-    private var samples: [SystemMonitor.CPUTicks]
-    private var deliveredSamples = 0
-    private var waitingConcurrentReaders = 0
-
-    init(samples: [SystemMonitor.CPUTicks]) {
-        self.samples = samples
-    }
-
-    func next() -> SystemMonitor.CPUTicks {
-        let sample: SystemMonitor.CPUTicks
-        let shouldWait: Bool
-        let shouldRelease: Bool
-
-        lock.lock()
-        sample = samples.removeFirst()
-        deliveredSamples += 1
-        shouldWait = deliveredSamples > 1
-        if shouldWait {
-            waitingConcurrentReaders += 1
-            shouldRelease = waitingConcurrentReaders == 2
-        } else {
-            shouldRelease = false
-        }
-        lock.unlock()
-
-        guard shouldWait else {
-            return sample
-        }
-        if shouldRelease {
-            releaseConcurrentReaders.signal()
-            releaseConcurrentReaders.signal()
-        }
-        releaseConcurrentReaders.wait()
-        return sample
-    }
+private struct ProviderMetrics {
+    var activeCalls = 0
+    var maxConcurrentCalls = 0
 }

@@ -1,6 +1,36 @@
 import Combine
 import Foundation
 
+private struct RefreshResult {
+    var system: SystemSnapshot
+    var diskGrowth: DiskGrowthSummary
+    var cacheEstimate: CacheEstimate
+    var codexQuota: CodexQuotaSnapshot
+}
+
+private func buildRefreshResult(
+    previousIO: DiskIOSnapshot,
+    systemMonitor: any SystemMonitoring,
+    diskStore: any DiskGrowthStoring,
+    cacheAnalyzer: any CacheAnalyzing,
+    codexReader: any CodexQuotaReading
+) -> RefreshResult {
+    let system = systemMonitor.snapshot(previousIO: previousIO)
+    let diskSnapshot = DiskSnapshot(
+        timestamp: system.timestamp,
+        availableBytes: system.diskCapacity.availableBytes,
+        totalBytes: system.diskCapacity.totalBytes
+    )
+    try? diskStore.record(diskSnapshot)
+
+    return RefreshResult(
+        system: system,
+        diskGrowth: diskStore.growthSummary(now: system.timestamp),
+        cacheEstimate: cacheAnalyzer.estimate(),
+        codexQuota: codexReader.latestQuotaSnapshot()
+    )
+}
+
 protocol SystemMonitoring: Sendable {
     func snapshot(previousIO: DiskIOSnapshot?) -> SystemSnapshot
 }
@@ -66,7 +96,7 @@ final class AppState: ObservableObject {
         let codexReader = self.codexReader
 
         refreshQueue.async { [weak self] in
-            let result = Self.buildRefreshResult(
+            let result = buildRefreshResult(
                 previousIO: previousIO,
                 systemMonitor: systemMonitor,
                 diskStore: diskStore,
@@ -85,35 +115,5 @@ final class AppState: ObservableObject {
                 self.isRefreshing = false
             }
         }
-    }
-
-    private static func buildRefreshResult(
-        previousIO: DiskIOSnapshot,
-        systemMonitor: any SystemMonitoring,
-        diskStore: any DiskGrowthStoring,
-        cacheAnalyzer: any CacheAnalyzing,
-        codexReader: any CodexQuotaReading
-    ) -> RefreshResult {
-        let system = systemMonitor.snapshot(previousIO: previousIO)
-        let diskSnapshot = DiskSnapshot(
-            timestamp: system.timestamp,
-            availableBytes: system.diskCapacity.availableBytes,
-            totalBytes: system.diskCapacity.totalBytes
-        )
-        try? diskStore.record(diskSnapshot)
-
-        return RefreshResult(
-            system: system,
-            diskGrowth: diskStore.growthSummary(now: system.timestamp),
-            cacheEstimate: cacheAnalyzer.estimate(),
-            codexQuota: codexReader.latestQuotaSnapshot()
-        )
-    }
-
-    private struct RefreshResult {
-        var system: SystemSnapshot
-        var diskGrowth: DiskGrowthSummary
-        var cacheEstimate: CacheEstimate
-        var codexQuota: CodexQuotaSnapshot
     }
 }

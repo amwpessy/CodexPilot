@@ -116,3 +116,43 @@ Notes:
 ### Concerns
 
 - The requested Task 5 fix is in place, but the project still emits a pre-existing `AppState.buildRefreshResult(...)` actor-isolation warning during Xcode builds. I left that untouched because this re-review was scoped to the `SystemMonitor` CPU-history sendability issue only.
+
+---
+
+## Task 5 Final Re-review Fix
+
+### What I fixed
+
+- Serialized CPU sample acquisition and CPU baseline mutation together inside `LockedCPUTickHistory.sampleDelta(using:)`, so `SystemMonitor.snapshot(previousIO:)` can no longer fetch ticks in one order and swap baselines in another.
+- Simplified the CPU concurrency regression test to verify the synchronized helper behavior through `SystemMonitor`: concurrent snapshot callers now prove the injected `cpuTicksProvider` never overlaps and still produce the expected sequential delta percentages.
+- Moved refresh result construction out of `@MainActor AppState` into a private file-level helper, removing the background call to the actor-isolated `AppState.buildRefreshResult(...)` method.
+
+### Tests run and results, including exact commands/output and whether warnings remain
+
+- Ran:
+  - `/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild build-for-testing -project /Users/laosuer/Xcode/60714SeeS/MacStatusCodexMonitor.xcodeproj -scheme MacStatusCodexMonitor -destination 'platform=macOS' -derivedDataPath /private/tmp/MacStatusCodexMonitor-task5-finalfix-bft`
+- Result:
+  - `** TEST BUILD SUCCEEDED **`
+  - The prior actor-isolation warning about `AppState.buildRefreshResult(...)` did not appear.
+  - Remaining warnings were unrelated to the requested fix:
+    - `MacStatusCodexMonitorTests: ld: warning: building for macOS-13.0, but linking with dylib '@rpath/XCTest.framework/Versions/A/XCTest' which was built for newer version 14.0`
+    - `MacStatusCodexMonitorTests: ld: warning: building for macOS-13.0, but linking with dylib '@rpath/libXCTestSwiftSupport.dylib' which was built for newer version 14.0`
+
+- Ran:
+  - `/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild build -project /Users/laosuer/Xcode/60714SeeS/MacStatusCodexMonitor.xcodeproj -scheme MacStatusCodexMonitor -destination 'platform=macOS' -derivedDataPath /private/tmp/MacStatusCodexMonitor-task5-finalfix-build`
+- Result:
+  - `** BUILD SUCCEEDED **`
+  - The prior actor-isolation warning about `AppState.buildRefreshResult(...)` did not appear.
+
+- Ran:
+  - `/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test -project /Users/laosuer/Xcode/60714SeeS/MacStatusCodexMonitor.xcodeproj -scheme MacStatusCodexMonitor -destination 'platform=macOS' -derivedDataPath /private/tmp/MacStatusCodexMonitor-task5-finalfix-test`
+- Result:
+  - `Testing failed:`
+  - `MacStatusCodexMonitor encountered an error (Failed to establish communication with the test runner. (Underlying Error: Couldn’t communicate with a helper application. Try your operation again. If that fails, quit and relaunch the application and try again. The connection to service named com.apple.testmanagerd.control was invalidated: Connection init failed at lookup with error 159 - Sandbox restriction.))`
+  - `IDETestOperationsObserverDebug: Failure collecting logarchive: Error Domain=NSCocoaErrorDomain Code=4099 "The connection to service named com.apple.testmanagerd.control was invalidated: Connection init failed at lookup with error 159 - Sandbox restriction."`
+
+### Files changed
+
+- `MacStatusCodexMonitor/App/AppState.swift`
+- `MacStatusCodexMonitor/Monitors/SystemMonitor.swift`
+- `MacStatusCodexMonitorTests/SystemMonitorTests.swift`
