@@ -3,13 +3,22 @@ import Foundation
 final class DiskGrowthStore {
     private let storageURL: URL
     private let retention: TimeInterval = 30 * 24 * 3600
+    // Require a baseline close to the 24h target so sparse history cannot masquerade as a 24h delta.
+    private let baselineTolerance: TimeInterval = 2 * 3600
 
     init(storageURL: URL = DiskGrowthStore.defaultStorageURL()) {
         self.storageURL = storageURL
     }
 
     func record(_ snapshot: DiskSnapshot) throws {
-        var snapshots = loadSnapshots()
+        var snapshots: [DiskSnapshot]
+        do {
+            snapshots = try loadSnapshotsOrThrow()
+        } catch SnapshotLoadError.corruptStore {
+            try quarantineCorruptStore()
+            snapshots = []
+        }
+
         snapshots.append(snapshot)
 
         let cutoff = snapshot.timestamp.addingTimeInterval(-retention)
@@ -26,12 +35,10 @@ final class DiskGrowthStore {
     }
 
     func loadSnapshots() -> [DiskSnapshot] {
-        guard let data = try? Data(contentsOf: storageURL),
-              let snapshots = try? JSONDecoder.diskSnapshotDecoder.decode([DiskSnapshot].self, from: data) else {
+        guard let snapshots = try? loadSnapshotsOrThrow() else {
             return []
         }
-
-        return snapshots.sorted { $0.timestamp < $1.timestamp }
+        return snapshots
     }
 
     func growthSummary(now: Date) -> DiskGrowthSummary {
@@ -69,7 +76,16 @@ final class DiskGrowthStore {
             )
         }
 
-        let baseline = snapshots.last(where: { $0.timestamp <= target }) ?? earliest
+        guard let baseline = nearestBaseline(to: target, in: snapshots) else {
+            return DiskGrowthSummary(
+                latest: latest,
+                baseline: nil,
+                growthBytes: nil,
+                observedHours: observedHours,
+                statusText: "Learning: sparse 24h history"
+            )
+        }
+
         let growth = Int64(baseline.availableBytes) - Int64(latest.availableBytes)
 
         return DiskGrowthSummary(
@@ -86,6 +102,45 @@ final class DiskGrowthStore {
             ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Application Support")
         return appSupport.appendingPathComponent("MacStatusCodexMonitor/disk-snapshots.json")
     }
+
+    private func loadSnapshotsOrThrow() throws -> [DiskSnapshot] {
+        guard FileManager.default.fileExists(atPath: storageURL.path) else {
+            return []
+        }
+
+        let data = try Data(contentsOf: storageURL)
+        do {
+            let snapshots = try JSONDecoder.diskSnapshotDecoder.decode([DiskSnapshot].self, from: data)
+            return snapshots.sorted { $0.timestamp < $1.timestamp }
+        } catch {
+            throw SnapshotLoadError.corruptStore(error)
+        }
+    }
+
+    private func nearestBaseline(to target: Date, in snapshots: [DiskSnapshot]) -> DiskSnapshot? {
+        let candidate = snapshots.min { lhs, rhs in
+            abs(lhs.timestamp.timeIntervalSince(target)) < abs(rhs.timestamp.timeIntervalSince(target))
+        }
+
+        guard let candidate,
+              abs(candidate.timestamp.timeIntervalSince(target)) <= baselineTolerance else {
+            return nil
+        }
+
+        return candidate
+    }
+
+    private func quarantineCorruptStore() throws {
+        let backupURL = storageURL.appendingPathExtension("corrupt")
+        if FileManager.default.fileExists(atPath: backupURL.path) {
+            try FileManager.default.removeItem(at: backupURL)
+        }
+        try FileManager.default.moveItem(at: storageURL, to: backupURL)
+    }
+}
+
+private enum SnapshotLoadError: Error {
+    case corruptStore(Error)
 }
 
 private extension JSONEncoder {
