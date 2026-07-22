@@ -1,3 +1,5 @@
 .derivedData/
 .derivedData*/
 .swift-module-cache/
+xcuserdata/
+*.xcuserstate

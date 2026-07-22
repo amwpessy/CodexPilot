@@ -57,3 +57,14 @@ struct CacheGrowthSummary: Equatable {
     var observedHours: Double
     var statusText: String
 }
+
+struct CacheCleanResult: Equatable, Sendable {
+    struct Failure: Equatable, Sendable {
+        var path: String
+        var message: String
+    }
+
+    var removedBytes: UInt64
+    var removedItemCount: Int
+    var failures: [Failure]
+}

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
    LastUpgradeVersion = "1600"
-   version = "1.7">
+   version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "A1B2C3D4E5F6000100000018"
-               BuildableName = "MacStatusCodexMonitor.app"
+               BuildableName = "CodexPilot.app"
                BlueprintName = "MacStatusCodexMonitor"
                ReferencedContainer = "container:MacStatusCodexMonitor.xcodeproj">
             </BuildableReference>
@@ -45,7 +45,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A1B2C3D4E5F6000100000018"
-            BuildableName = "MacStatusCodexMonitor.app"
+            BuildableName = "CodexPilot.app"
             BlueprintName = "MacStatusCodexMonitor"
             ReferencedContainer = "container:MacStatusCodexMonitor.xcodeproj">
          </BuildableReference>
@@ -78,7 +78,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A1B2C3D4E5F6000100000018"
-            BuildableName = "MacStatusCodexMonitor.app"
+            BuildableName = "CodexPilot.app"
             BlueprintName = "MacStatusCodexMonitor"
             ReferencedContainer = "container:MacStatusCodexMonitor.xcodeproj">
          </BuildableReference>
@@ -95,7 +95,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A1B2C3D4E5F6000100000018"
-            BuildableName = "MacStatusCodexMonitor.app"
+            BuildableName = "CodexPilot.app"
             BlueprintName = "MacStatusCodexMonitor"
             ReferencedContainer = "container:MacStatusCodexMonitor.xcodeproj">
          </BuildableReference>

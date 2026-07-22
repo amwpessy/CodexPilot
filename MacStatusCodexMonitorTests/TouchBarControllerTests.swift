@@ -193,6 +193,10 @@ private struct StubTouchBarCacheAnalyzer: CacheAnalyzing {
     func estimate() -> CacheEstimate {
         CacheEstimate(totalBytes: 0, entries: [], scannedAt: Date(), statusText: "none")
     }
+
+    func clean() throws -> CacheCleanResult {
+        CacheCleanResult(removedBytes: 0, removedItemCount: 0, failures: [])
+    }
 }
 
 private struct StubTouchBarCodexQuotaReader: CodexQuotaReading {

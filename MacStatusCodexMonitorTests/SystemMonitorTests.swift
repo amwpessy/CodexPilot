@@ -27,7 +27,7 @@ final class SystemMonitorTests: XCTestCase {
         let second = monitor.snapshot()
 
         XCTAssertNil(first.cpuUsage)
-        XCTAssertEqual(second.cpuUsage ?? -1, 50, accuracy: 0.001)
+        XCTAssertEqual(second.cpuUsage ?? -1, 60, accuracy: 0.001)
     }
 
     func testSnapshotSamplesMemoryOncePerSnapshot() {

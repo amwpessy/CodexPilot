@@ -97,6 +97,30 @@ final class DiskGrowthStoreTests: XCTestCase {
         XCTAssertEqual(estimate.statusText, "User-cache estimate")
     }
 
+    func testCacheAnalyzerCleansConfiguredCacheDirectoryContents() throws {
+        let directory = try makeTemporaryDirectory()
+        let cachesURL = directory.appendingPathComponent("Caches", isDirectory: true)
+        let nestedURL = cachesURL.appendingPathComponent("Nested", isDirectory: true)
+        try FileManager.default.createDirectory(at: nestedURL, withIntermediateDirectories: true)
+
+        try Data(repeating: 0x61, count: 3).write(to: cachesURL.appendingPathComponent("top.bin"))
+        try Data(repeating: 0x62, count: 5).write(to: nestedURL.appendingPathComponent("nested.bin"))
+
+        let analyzer = CacheAnalyzer(directories: [cachesURL], cleanableDirectories: [cachesURL])
+        let result = try analyzer.clean()
+        let remainingContents = try FileManager.default.contentsOfDirectory(
+            at: cachesURL,
+            includingPropertiesForKeys: nil
+        )
+
+        XCTAssertEqual(result.removedBytes, 8)
+        XCTAssertEqual(result.removedItemCount, 2)
+        XCTAssertTrue(result.failures.isEmpty)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: cachesURL.path))
+        XCTAssertTrue(remainingContents.isEmpty)
+        XCTAssertEqual(analyzer.estimate().totalBytes, 0)
+    }
+
     func testDiskIOHistoryComputesTwentyFourHourReadWriteDeltas() throws {
         let directory = try makeTemporaryDirectory()
         let store = DiskIOHistoryStore(storageURL: directory.appendingPathComponent("disk-io.json"))

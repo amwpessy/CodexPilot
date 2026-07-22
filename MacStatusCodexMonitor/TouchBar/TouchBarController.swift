@@ -51,7 +51,7 @@ final class TouchBarController: NSObject, NSTouchBarDelegate {
         }
 
         let item = NSCustomTouchBarItem(identifier: identifier)
-        item.customizationLabel = "Mac Status & Codex"
+        item.customizationLabel = "CodexPilot"
 
         let view = TouchBarStatusStripView()
         view.update(metrics: currentMetrics())

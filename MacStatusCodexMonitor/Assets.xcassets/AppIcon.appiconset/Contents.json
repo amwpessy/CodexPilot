@@ -1,0 +1,68 @@
+{
+  "images": [
+    {
+      "filename": "codexpilot-16.png",
+      "idiom": "mac",
+      "scale": "1x",
+      "size": "16x16"
+    },
+    {
+      "filename": "codexpilot-32.png",
+      "idiom": "mac",
+      "scale": "2x",
+      "size": "16x16"
+    },
+    {
+      "filename": "codexpilot-32.png",
+      "idiom": "mac",
+      "scale": "1x",
+      "size": "32x32"
+    },
+    {
+      "filename": "codexpilot-64.png",
+      "idiom": "mac",
+      "scale": "2x",
+      "size": "32x32"
+    },
+    {
+      "filename": "codexpilot-128.png",
+      "idiom": "mac",
+      "scale": "1x",
+      "size": "128x128"
+    },
+    {
+      "filename": "codexpilot-256.png",
+      "idiom": "mac",
+      "scale": "2x",
+      "size": "128x128"
+    },
+    {
+      "filename": "codexpilot-256.png",
+      "idiom": "mac",
+      "scale": "1x",
+      "size": "256x256"
+    },
+    {
+      "filename": "codexpilot-512.png",
+      "idiom": "mac",
+      "scale": "2x",
+      "size": "256x256"
+    },
+    {
+      "filename": "codexpilot-512.png",
+      "idiom": "mac",
+      "scale": "1x",
+      "size": "512x512"
+    },
+    {
+      "filename": "codexpilot-1024.png",
+      "idiom": "mac",
+      "scale": "2x",
+      "size": "512x512"
+    }
+  ],
+  "info": {
+    "author": "xcode",
+    "version": 1
+  }
+}

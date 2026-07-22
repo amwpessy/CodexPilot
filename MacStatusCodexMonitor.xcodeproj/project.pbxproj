@@ -1,9 +1,9 @@
 // !$*UTF8*$!
 {
-	objectVersion = 56;
 	archiveVersion = 1;
 	classes = {
 	};
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -34,6 +34,7 @@
 		A1B2C3D4E5F600010000003B /* MenuBarPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600020000001C /* MenuBarPopoverView.swift */; };
 		A1B2C3D4E5F600010000003D /* TouchBarControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600020000001D /* TouchBarControllerTests.swift */; };
 		A1B2C3D4E5F600010000003E /* TouchBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600020000001E /* TouchBarController.swift */; };
+		A1B2C3D4E5F6000100000040 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600020000001F /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,7 +51,7 @@
 		A1B2C3D4E5F6000200000001 /* MacStatusCodexMonitorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacStatusCodexMonitorApp.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6000200000002 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6000200000003 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A1B2C3D4E5F6000200000004 /* MacStatusCodexMonitor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MacStatusCodexMonitor.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1B2C3D4E5F6000200000004 /* CodexPilot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CodexPilot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1B2C3D4E5F6000200000005 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		A1B2C3D4E5F6000200000006 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		A1B2C3D4E5F6000200000007 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
@@ -77,6 +78,8 @@
 		A1B2C3D4E5F600020000001C /* MenuBarPopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarPopoverView.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F600020000001D /* TouchBarControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchBarControllerTests.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F600020000001E /* TouchBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchBarController.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600020000001F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000200000020 /* CodexPilot.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CodexPilot.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,6 +124,8 @@
 				A1B2C3D4E5F600010000003F /* TouchBar */,
 				A1B2C3D4E5F600010000002D /* Utilities */,
 				A1B2C3D4E5F600010000003C /* Views */,
+				A1B2C3D4E5F600020000001F /* Assets.xcassets */,
+				A1B2C3D4E5F6000200000020 /* CodexPilot.entitlements */,
 				A1B2C3D4E5F6000200000003 /* Info.plist */,
 			);
 			path = MacStatusCodexMonitor;
@@ -147,6 +152,26 @@
 				A1B2C3D4E5F600020000001D /* TouchBarControllerTests.swift */,
 			);
 			path = MacStatusCodexMonitorTests;
+			sourceTree = "<group>";
+		};
+		A1B2C3D4E5F600010000000F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D4E5F6000200000006 /* AppKit.framework */,
+				A1B2C3D4E5F6000200000007 /* IOKit.framework */,
+				A1B2C3D4E5F6000200000005 /* SwiftUI.framework */,
+				A1B2C3D4E5F6000200000008 /* XCTest.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A1B2C3D4E5F6000100000010 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D4E5F6000200000004 /* CodexPilot.app */,
+				A1B2C3D4E5F6000200000009 /* MacStatusCodexMonitorTests.xctest */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		A1B2C3D4E5F600010000002C /* Models */ = {
@@ -197,26 +222,6 @@
 			path = TouchBar;
 			sourceTree = "<group>";
 		};
-		A1B2C3D4E5F600010000000F /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				A1B2C3D4E5F6000200000006 /* AppKit.framework */,
-				A1B2C3D4E5F6000200000007 /* IOKit.framework */,
-				A1B2C3D4E5F6000200000005 /* SwiftUI.framework */,
-				A1B2C3D4E5F6000200000008 /* XCTest.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		A1B2C3D4E5F6000100000010 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				A1B2C3D4E5F6000200000004 /* MacStatusCodexMonitor.app */,
-				A1B2C3D4E5F6000200000009 /* MacStatusCodexMonitorTests.xctest */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -234,7 +239,7 @@
 			);
 			name = MacStatusCodexMonitor;
 			productName = MacStatusCodexMonitor;
-			productReference = A1B2C3D4E5F6000200000004 /* MacStatusCodexMonitor.app */;
+			productReference = A1B2C3D4E5F6000200000004 /* CodexPilot.app */;
 			productType = "com.apple.product-type.application";
 		};
 		A1B2C3D4E5F6000100000019 /* MacStatusCodexMonitorTests */ = {
@@ -298,6 +303,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1B2C3D4E5F6000100000040 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -405,8 +411,11 @@
 		A1B2C3D4E5F600010000001D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MacStatusCodexMonitor/CodexPilot.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HJT66Q2FWA;
 				ENABLE_TESTABILITY = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MacStatusCodexMonitor/Info.plist;
@@ -415,11 +424,12 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				PRODUCT_BUNDLE_IDENTIFIER = local.MacStatusCodexMonitor;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.lynncat.codexpilot;
+				PRODUCT_MODULE_NAME = MacStatusCodexMonitor;
+				PRODUCT_NAME = CodexPilot;
 				SDKROOT = macosx;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -427,8 +437,11 @@
 		A1B2C3D4E5F600010000001E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MacStatusCodexMonitor/CodexPilot.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HJT66Q2FWA;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MacStatusCodexMonitor/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -436,8 +449,9 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				PRODUCT_BUNDLE_IDENTIFIER = local.MacStatusCodexMonitor;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.lynncat.codexpilot;
+				PRODUCT_MODULE_NAME = MacStatusCodexMonitor;
+				PRODUCT_NAME = CodexPilot;
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -456,8 +470,8 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CodexPilot.app/Contents/MacOS/CodexPilot";
 				TEST_TARGET_NAME = MacStatusCodexMonitor;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MacStatusCodexMonitor.app/Contents/MacOS/MacStatusCodexMonitor";
 			};
 			name = Debug;
 		};
@@ -473,8 +487,8 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CodexPilot.app/Contents/MacOS/CodexPilot";
 				TEST_TARGET_NAME = MacStatusCodexMonitor;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MacStatusCodexMonitor.app/Contents/MacOS/MacStatusCodexMonitor";
 			};
 			name = Release;
 		};
