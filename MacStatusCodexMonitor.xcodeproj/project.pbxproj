@@ -34,6 +34,9 @@
 		A1B2C3D4E5F600010000003B /* MenuBarPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600020000001C /* MenuBarPopoverView.swift */; };
 		A1B2C3D4E5F600010000003D /* TouchBarControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600020000001D /* TouchBarControllerTests.swift */; };
 		A1B2C3D4E5F600010000003E /* TouchBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600020000001E /* TouchBarController.swift */; };
+		A1B2C3D4E5F6000100000041 /* CommunityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000021 /* CommunityService.swift */; };
+		A1B2C3D4E5F6000100000042 /* CommunityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000022 /* CommunityView.swift */; };
+		A1B2C3D4E5F6000100000043 /* CommunityServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000023 /* CommunityServiceTests.swift */; };
 		A1B2C3D4E5F6000100000040 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600020000001F /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -80,6 +83,9 @@
 		A1B2C3D4E5F600020000001E /* TouchBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchBarController.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F600020000001F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A1B2C3D4E5F6000200000020 /* CodexPilot.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CodexPilot.entitlements; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000200000021 /* CommunityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunityService.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000200000022 /* CommunityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunityView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000200000023 /* CommunityServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunityServiceTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,6 +143,7 @@
 				A1B2C3D4E5F6000200000002 /* AppDelegate.swift */,
 				A1B2C3D4E5F6000200000015 /* AppState.swift */,
 				A1B2C3D4E5F6000200000016 /* MonitoringScheduler.swift */,
+				A1B2C3D4E5F6000200000021 /* CommunityService.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -150,6 +157,7 @@
 				A1B2C3D4E5F6000200000018 /* SystemMonitorTests.swift */,
 				A1B2C3D4E5F6000200000019 /* AppStateTests.swift */,
 				A1B2C3D4E5F600020000001D /* TouchBarControllerTests.swift */,
+				A1B2C3D4E5F6000200000023 /* CommunityServiceTests.swift */,
 			);
 			path = MacStatusCodexMonitorTests;
 			sourceTree = "<group>";
@@ -210,6 +218,7 @@
 				A1B2C3D4E5F600020000001A /* MetricTile.swift */,
 				A1B2C3D4E5F600020000001B /* DashboardView.swift */,
 				A1B2C3D4E5F600020000001C /* MenuBarPopoverView.swift */,
+				A1B2C3D4E5F6000200000022 /* CommunityView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -338,6 +347,8 @@
 				A1B2C3D4E5F6000100000032 /* CacheAnalyzer.swift in Sources */,
 				A1B2C3D4E5F6000100000036 /* SystemMonitor.swift in Sources */,
 				A1B2C3D4E5F600010000003E /* TouchBarController.swift in Sources */,
+				A1B2C3D4E5F6000100000041 /* CommunityService.swift in Sources */,
+				A1B2C3D4E5F6000100000042 /* CommunityView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -351,6 +362,7 @@
 				A1B2C3D4E5F6000100000037 /* SystemMonitorTests.swift in Sources */,
 				A1B2C3D4E5F6000100000038 /* AppStateTests.swift in Sources */,
 				A1B2C3D4E5F600010000003D /* TouchBarControllerTests.swift in Sources */,
+				A1B2C3D4E5F6000100000043 /* CommunityServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -412,9 +424,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_ENTITLEMENTS = MacStatusCodexMonitor/CodexPilot.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = HJT66Q2FWA;
 				ENABLE_TESTABILITY = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -425,6 +438,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.lynncat.codexpilot;
+				PROVISIONING_PROFILE_SPECIFIER = "CodexPilot macOS Development";
 				PRODUCT_MODULE_NAME = MacStatusCodexMonitor;
 				PRODUCT_NAME = CodexPilot;
 				SDKROOT = macosx;
@@ -440,7 +454,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = MacStatusCodexMonitor/CodexPilot.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = HJT66Q2FWA;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MacStatusCodexMonitor/Info.plist;
@@ -463,7 +477,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				PRODUCT_BUNDLE_IDENTIFIER = local.MacStatusCodexMonitorTests;
@@ -480,7 +494,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				PRODUCT_BUNDLE_IDENTIFIER = local.MacStatusCodexMonitorTests;

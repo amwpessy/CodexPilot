@@ -70,9 +70,15 @@ private extension EnvironmentValues {
     }
 }
 
+private enum DashboardPage {
+    case cockpit
+    case community
+}
+
 struct DashboardView: View {
     @ObservedObject var state: AppState
     @AppStorage(CockpitTheme.storageKey) private var sportThemeEnabled = false
+    @State private var selectedPage: DashboardPage = .cockpit
 
     private var theme: CockpitTheme {
         CockpitTheme(sportMode: sportThemeEnabled)
@@ -83,16 +89,20 @@ struct DashboardView: View {
             VStack(alignment: .leading, spacing: 16) {
                 headerBand
 
-                HStack(alignment: .top, spacing: 14) {
-                    systemHealthColumn
-                        .frame(minWidth: 220, maxWidth: 260, alignment: .top)
-                    diskAnalysisColumn
-                        .frame(minWidth: 320, maxWidth: .infinity, alignment: .top)
-                    codexColumn
-                        .frame(minWidth: 260, maxWidth: 300, alignment: .top)
-                }
+                if selectedPage == .cockpit {
+                    HStack(alignment: .top, spacing: 14) {
+                        systemHealthColumn
+                            .frame(minWidth: 220, maxWidth: 260, alignment: .top)
+                        diskAnalysisColumn
+                            .frame(minWidth: 320, maxWidth: .infinity, alignment: .top)
+                        codexColumn
+                            .frame(minWidth: 260, maxWidth: 300, alignment: .top)
+                    }
 
-                cacheColumn
+                    cacheColumn
+                } else {
+                    CommunityView()
+                }
             }
             .padding(18)
         }
@@ -142,55 +152,66 @@ struct DashboardView: View {
                 StatusDot(label: "运行中 / Active", color: .green)
             }
 
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 145), spacing: 10)], spacing: 10) {
-                SummaryPill(
-                    title: "处理器 / CPU",
-                    value: PercentFormatterUtility.string(state.system.cpuUsage),
-                    detail: "实时采样 / Live sample",
-                    progress: normalizedPercent(state.system.cpuUsage),
-                    trend: trendValues(\.cpuUsage),
-                    tint: CockpitTheme.redline
-                )
-                SummaryPill(
-                    title: "内存 / Memory",
-                    value: PercentFormatterUtility.string(state.system.memoryUsedPercent),
-                    detail: memoryDetail,
-                    progress: normalizedPercent(state.system.memoryUsedPercent),
-                    trend: trendValues(\.memoryUsedPercent),
-                    tint: CockpitTheme.cyan
-                )
-                SummaryPill(
-                    title: "硬盘 / Disk",
-                    value: PercentFormatterUtility.string(state.system.diskCapacity.usedPercent),
-                    detail: diskDetail,
-                    progress: normalizedPercent(state.system.diskCapacity.usedPercent),
-                    trend: trendValues(\.diskUsedPercent),
-                    tint: CockpitTheme.amber
-                )
-                SummaryPill(
-                    title: "硬盘读写 / Disk I/O",
-                    value: diskIOHeaderValue,
-                    detail: diskIOHeaderDetail,
-                    progress: normalizedPercent(latestDiskIOActivityPercent),
-                    trend: trendValues(\.diskIOActivityPercent),
-                    tint: CockpitTheme.green
-                )
-                SummaryPill(
-                    title: "电池 / Battery",
-                    value: batteryValue,
-                    detail: bilingualStatus(state.system.battery.statusText),
-                    progress: normalizedPercent(state.system.battery.percent),
-                    trend: trendValues(\.batteryPercent),
-                    tint: batteryTint
-                )
-                SummaryPill(
-                    title: "Codex 额度 / Quota",
-                    value: codexRemainingValue,
-                    detail: codexDetail,
-                    progress: normalizedPercent(state.codexQuota.remainingPercent),
-                    trend: trendValues(\.codexRemainingPercent),
-                    tint: .purple
-                )
+            HStack(spacing: 2) {
+                dashboardPageButton(title: "驾驶舱 / Cockpit", systemImage: "gauge.with.dots.needle.bottom.50percent", page: .cockpit)
+                dashboardPageButton(title: "用户交流 / Community", systemImage: "person.2.fill", page: .community)
+                Spacer(minLength: 0)
+            }
+            .padding(2)
+            .background(theme.panelRaised.opacity(0.76), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).stroke(theme.hairline, lineWidth: 1))
+
+            if selectedPage == .cockpit {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 145), spacing: 10)], spacing: 10) {
+                    SummaryPill(
+                        title: "处理器 / CPU",
+                        value: PercentFormatterUtility.string(state.system.cpuUsage),
+                        detail: "实时采样 / Live sample",
+                        progress: normalizedPercent(state.system.cpuUsage),
+                        trend: trendValues(\.cpuUsage),
+                        tint: CockpitTheme.redline
+                    )
+                    SummaryPill(
+                        title: "内存 / Memory",
+                        value: PercentFormatterUtility.string(state.system.memoryUsedPercent),
+                        detail: memoryDetail,
+                        progress: normalizedPercent(state.system.memoryUsedPercent),
+                        trend: trendValues(\.memoryUsedPercent),
+                        tint: CockpitTheme.cyan
+                    )
+                    SummaryPill(
+                        title: "硬盘 / Disk",
+                        value: PercentFormatterUtility.string(state.system.diskCapacity.usedPercent),
+                        detail: diskDetail,
+                        progress: normalizedPercent(state.system.diskCapacity.usedPercent),
+                        trend: trendValues(\.diskUsedPercent),
+                        tint: CockpitTheme.amber
+                    )
+                    SummaryPill(
+                        title: "硬盘读写 / Disk I/O",
+                        value: diskIOHeaderValue,
+                        detail: diskIOHeaderDetail,
+                        progress: normalizedPercent(latestDiskIOActivityPercent),
+                        trend: trendValues(\.diskIOActivityPercent),
+                        tint: CockpitTheme.green
+                    )
+                    SummaryPill(
+                        title: "电池 / Battery",
+                        value: batteryValue,
+                        detail: bilingualStatus(state.system.battery.statusText),
+                        progress: normalizedPercent(state.system.battery.percent),
+                        trend: trendValues(\.batteryPercent),
+                        tint: batteryTint
+                    )
+                    SummaryPill(
+                        title: "Codex 额度 / Quota",
+                        value: codexRemainingValue,
+                        detail: codexDetail,
+                        progress: normalizedPercent(state.codexQuota.remainingPercent),
+                        trend: trendValues(\.codexRemainingPercent),
+                        tint: .purple
+                    )
+                }
             }
         }
         .padding(16)
@@ -232,6 +253,25 @@ struct DashboardView: View {
                     selected ? theme.overlayAccent.opacity(sportMode ? 0.32 : 0.20) : Color.clear,
                     in: RoundedRectangle(cornerRadius: 6, style: .continuous)
                 )
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func dashboardPageButton(title: String, systemImage: String, page: DashboardPage) -> some View {
+        let selected = selectedPage == page
+        return Button {
+            withAnimation(.easeInOut(duration: 0.18)) {
+                selectedPage = page
+            }
+        } label: {
+            Label(title, systemImage: systemImage)
+                .font(.caption)
+                .fontWeight(.semibold)
+                .lineLimit(1)
+                .foregroundStyle(selected ? theme.text : theme.secondaryText)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(selected ? theme.overlayAccent.opacity(0.20) : Color.clear, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
         }
         .buttonStyle(.plain)
     }

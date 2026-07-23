@@ -24,6 +24,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var menuBarRotationTimer: Timer?
     private var menuBarMetricIndex = 0
     private var menuBarTitleUpdateScheduled = false
+    @MainActor
+    private var communityAccount: CommunityAccountStore {
+        CommunityAccountStore.shared
+    }
 
     override init() {
         self.state = nil
@@ -58,6 +62,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         startMenuBarRotationTimer()
         showDashboard()
         startMonitoringScheduler()
+        communityAccount.setForeground(true)
+        Task { [communityAccount] in
+            await communityAccount.restoreSession()
+        }
     }
 
     @MainActor
@@ -65,6 +73,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         scheduler.stop()
         menuBarRotationTimer?.invalidate()
         menuBarRotationTimer = nil
+        communityAccount.setForeground(false)
         NotificationCenter.default.removeObserver(self, name: UserDefaults.didChangeNotification, object: nil)
         stateSubscription = nil
     }
