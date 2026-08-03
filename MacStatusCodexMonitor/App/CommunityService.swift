@@ -9,12 +9,69 @@ struct CommunityAccount: Codable, Equatable {
     var leaderboardVisible: Bool
 }
 
+#if POKER_FEATURE
+struct PokerPointsStatus: Codable, Equatable {
+    let pointsBalance: Int
+    let dailyWon: Int
+    let dailyLimit: Int
+    let dailyRemaining: Int
+    let dayKey: String
+    let resetsAt: Date
+}
+
+struct PokerSettlementReceipt: Codable, Equatable {
+    let handId: String
+    let requestedDelta: Int
+    let appliedDelta: Int
+    let pointsBalance: Int
+    let dailyWon: Int
+    let dailyLimit: Int
+    let dailyRemaining: Int
+    let dayKey: String
+    let resetsAt: Date
+}
+#endif
+
 struct CommunityAppleCredential: Encodable {
     let identityToken: String
     let authorizationCode: String
     let nonce: String
     let installationId: String
     let platform: String
+}
+
+struct CommunityPasswordCredential: Encodable {
+    let username: String
+    let password: String
+    let installationId: String
+    let platform: String
+}
+
+enum CommunityCredentialRules {
+    static let minimumPasswordLength = 8
+    static let maximumPasswordLength = 128
+
+    static func isValidUsername(_ value: String) -> Bool {
+        value.trimmingCharacters(in: .whitespacesAndNewlines).range(
+            of: #"^[A-Za-z0-9][A-Za-z0-9._-]{3,31}$"#,
+            options: .regularExpression
+        ) != nil
+    }
+
+    static func isValidPassword(_ value: String) -> Bool {
+        (minimumPasswordLength...maximumPasswordLength).contains(value.count)
+            && value.range(of: #"[A-Za-z]"#, options: .regularExpression) != nil
+            && value.range(of: #"[0-9]"#, options: .regularExpression) != nil
+    }
+
+    static func areValid(username: String, password: String) -> Bool {
+        isValidUsername(username) && isValidPassword(password)
+    }
+}
+
+private struct CommunityPasswordLinkCredential: Encodable {
+    let username: String
+    let password: String
 }
 
 struct CommunityLeaderboardEntry: Codable, Identifiable, Equatable {
@@ -99,10 +156,32 @@ final class CommunityAPI {
         let account: CommunityAccount
     }
 
+    private struct PasswordLinkEnvelope: Decodable {
+        let linked: Bool
+    }
+
     private struct HeartbeatEnvelope: Decodable {
         let pointsBalance: Int
         let activeSeconds: Int
         let leaseVersion: Int
+    }
+
+#if POKER_FEATURE
+    private struct PokerStatusEnvelope: Decodable {
+        let poker: PokerPointsStatus
+    }
+
+    private struct PokerSettlementEnvelope: Decodable {
+        let settlement: PokerSettlementReceipt
+    }
+#endif
+
+    private struct ShuihuStatusEnvelope: Decodable {
+        let cards: ShuihuCollectionStatus
+    }
+
+    private struct ShuihuDrawEnvelope: Decodable {
+        let draw: ShuihuDrawReceipt
     }
 
     private struct LeaderboardEnvelope: Decodable {
@@ -134,6 +213,13 @@ final class CommunityAPI {
         let leaderboardVisible: Bool
     }
 
+#if POKER_FEATURE
+    private struct PokerSettlementPayload: Encodable {
+        let handId: String
+        let delta: Int
+    }
+#endif
+
     private let baseURL = URL(string: "https://lynncat.com/markets")!
     private let session: URLSession
     private let encoder = JSONEncoder()
@@ -149,6 +235,29 @@ final class CommunityAPI {
     func signIn(_ credential: CommunityAppleCredential) async throws -> (token: String, account: CommunityAccount) {
         let envelope: SessionEnvelope = try await request(path: "auth/apple", method: "POST", body: credential)
         return (envelope.sessionToken, envelope.account)
+    }
+
+    func signIn(
+        _ credential: CommunityPasswordCredential,
+        registering: Bool
+    ) async throws -> (token: String, account: CommunityAccount) {
+        let action = registering ? "register" : "login"
+        let envelope: SessionEnvelope = try await request(
+            path: "auth/password/\(action)",
+            method: "POST",
+            body: credential
+        )
+        return (envelope.sessionToken, envelope.account)
+    }
+
+    func linkPasswordLogin(token: String, username: String, password: String) async throws {
+        let envelope: PasswordLinkEnvelope = try await request(
+            path: "auth/password/link",
+            method: "POST",
+            token: token,
+            body: CommunityPasswordLinkCredential(username: username, password: password)
+        )
+        guard envelope.linked else { throw CommunityServiceError.invalidResponse }
     }
 
     func account(token: String) async throws -> CommunityAccount {
@@ -174,6 +283,47 @@ final class CommunityAPI {
             token: token,
             body: LeasePayload(leaseVersion: leaseVersion)
         )
+    }
+
+#if POKER_FEATURE
+    func pokerStatus(token: String) async throws -> PokerPointsStatus {
+        let envelope: PokerStatusEnvelope = try await request(
+            path: "points/poker",
+            method: "GET",
+            token: token
+        )
+        return envelope.poker
+    }
+
+    func settlePokerHand(token: String, handId: String, delta: Int) async throws -> PokerSettlementReceipt {
+        let envelope: PokerSettlementEnvelope = try await request(
+            path: "points/poker/settle",
+            method: "POST",
+            token: token,
+            idempotencyKey: "codexpilot-poker-\(handId)",
+            body: PokerSettlementPayload(handId: handId, delta: delta)
+        )
+        return envelope.settlement
+    }
+#endif
+
+    func shuihuStatus(token: String) async throws -> ShuihuCollectionStatus {
+        let envelope: ShuihuStatusEnvelope = try await request(
+            path: "points/shuihu",
+            method: "GET",
+            token: token
+        )
+        return envelope.cards
+    }
+
+    func drawShuihuCard(token: String, requestID: String) async throws -> ShuihuDrawReceipt {
+        let envelope: ShuihuDrawEnvelope = try await request(
+            path: "points/shuihu/draw",
+            method: "POST",
+            token: token,
+            idempotencyKey: "devpilot-shuihu-\(requestID)"
+        )
+        return envelope.draw
     }
 
     func updateProfile(token: String, nickname: String, leaderboardVisible: Bool) async throws -> CommunityAccount {
@@ -348,8 +498,15 @@ final class CommunityAccountStore: ObservableObject {
     @Published private(set) var currentRank: CommunityLeaderboardEntry?
     @Published private(set) var isRestoring = false
     @Published private(set) var isSigningIn = false
+    @Published private(set) var isLinkingLogin = false
     @Published private(set) var isAccruing = false
     @Published private(set) var activeSeconds = 0
+#if POKER_FEATURE
+    @Published private(set) var pokerStatus: PokerPointsStatus?
+    @Published private(set) var isPokerSyncing = false
+#endif
+    @Published private(set) var shuihuStatus: ShuihuCollectionStatus?
+    @Published private(set) var isShuihuSyncing = false
     @Published private(set) var errorText: String?
 
     var isAuthenticated: Bool { account != nil && token != nil }
@@ -409,6 +566,42 @@ final class CommunityAccountStore: ObservableObject {
     }
 
     func signIn(_ credential: CommunityAppleCredential) async throws {
+        try await signIn {
+            try await api.signIn(credential)
+        }
+    }
+
+    func signIn(username: String, password: String, registering: Bool) async throws {
+        let credential = CommunityPasswordCredential(
+            username: username,
+            password: password,
+            installationId: CommunityInstallationID.current,
+            platform: "macos"
+        )
+        try await signIn {
+            try await api.signIn(credential, registering: registering)
+        }
+    }
+
+    func linkPasswordLogin(username: String, password: String) async throws {
+        guard let token, !isLinkingLogin else { return }
+        isLinkingLogin = true
+        errorText = nil
+        defer { isLinkingLogin = false }
+        do {
+            try await api.linkPasswordLogin(token: token, username: username, password: password)
+        } catch let error as CommunityServiceError where error.isAuthenticationFailure {
+            clearSession()
+            throw error
+        } catch {
+            errorText = "林猫账号绑定失败 / Lynncat login could not be linked"
+            throw error
+        }
+    }
+
+    private func signIn(
+        operation: () async throws -> (token: String, account: CommunityAccount)
+    ) async throws {
         guard !isSigningIn else { return }
         invalidatePendingWork(sendStop: true)
         let revision = sessionRevision
@@ -426,7 +619,7 @@ final class CommunityAccountStore: ObservableObject {
         }
 
         do {
-            let result = try await api.signIn(credential)
+            let result = try await operation()
             guard revision == sessionRevision else { throw CancellationError() }
 
             do {
@@ -439,6 +632,10 @@ final class CommunityAccountStore: ObservableObject {
             guard revision == sessionRevision else { throw CancellationError() }
             token = result.token
             account = result.account
+#if POKER_FEATURE
+            pokerStatus = nil
+#endif
+            shuihuStatus = nil
             leaseVersion = 0
             activeSeconds = 0
             errorText = nil
@@ -489,6 +686,106 @@ final class CommunityAccountStore: ObservableObject {
     func applyServerBalance(_ points: Int?) {
         guard let points else { return }
         account?.pointsBalance = points
+    }
+
+#if POKER_FEATURE
+    func refreshPokerStatus() async {
+        guard let token else {
+            pokerStatus = nil
+            return
+        }
+        let revision = sessionRevision
+        isPokerSyncing = true
+        defer { isPokerSyncing = false }
+        do {
+            let status = try await api.pokerStatus(token: token)
+            guard isCurrentSession(revision: revision, token: token) else { return }
+            account?.pointsBalance = status.pointsBalance
+            pokerStatus = status
+        } catch let error as CommunityServiceError where error.isAuthenticationFailure {
+            clearSession()
+        } catch {
+            errorText = "牌桌积分暂时无法同步 / Poker points unavailable"
+        }
+    }
+
+    func settlePokerHand(handId: String, delta: Int) async throws -> PokerSettlementReceipt {
+        guard let token else {
+            throw CommunityServiceError.server(statusCode: 401, code: "login_required")
+        }
+        let revision = sessionRevision
+        isPokerSyncing = true
+        defer { isPokerSyncing = false }
+        do {
+            let receipt = try await api.settlePokerHand(token: token, handId: handId, delta: delta)
+            guard isCurrentSession(revision: revision, token: token) else {
+                throw CancellationError()
+            }
+            account?.pointsBalance = receipt.pointsBalance
+            pokerStatus = PokerPointsStatus(
+                pointsBalance: receipt.pointsBalance,
+                dailyWon: receipt.dailyWon,
+                dailyLimit: receipt.dailyLimit,
+                dailyRemaining: receipt.dailyRemaining,
+                dayKey: receipt.dayKey,
+                resetsAt: receipt.resetsAt
+            )
+            errorText = nil
+            return receipt
+        } catch let error as CommunityServiceError where error.isAuthenticationFailure {
+            clearSession()
+            throw error
+        } catch {
+            errorText = "牌局结算失败 / Poker settlement failed"
+            throw error
+        }
+    }
+#endif
+
+    func refreshShuihuStatus() async {
+        guard let token else {
+            shuihuStatus = nil
+            return
+        }
+        let revision = sessionRevision
+        isShuihuSyncing = true
+        defer { isShuihuSyncing = false }
+        do {
+            let status = try await api.shuihuStatus(token: token)
+            guard isCurrentSession(revision: revision, token: token) else { return }
+            account?.pointsBalance = status.pointsBalance
+            shuihuStatus = status
+            errorText = nil
+        } catch let error as CommunityServiceError where error.isAuthenticationFailure {
+            clearSession()
+        } catch {
+            errorText = "水浒卡册暂时无法同步 / Card collection unavailable"
+        }
+    }
+
+    func drawShuihuCard(requestID: String) async throws -> ShuihuDrawReceipt {
+        guard let token else {
+            throw CommunityServiceError.server(statusCode: 401, code: "login_required")
+        }
+        let revision = sessionRevision
+        isShuihuSyncing = true
+        defer { isShuihuSyncing = false }
+        do {
+            let receipt = try await api.drawShuihuCard(token: token, requestID: requestID)
+            guard isCurrentSession(revision: revision, token: token) else {
+                throw CancellationError()
+            }
+            account?.pointsBalance = receipt.pointsBalance
+            shuihuStatus = receipt.status
+            errorText = nil
+            return receipt
+        } catch let error as CommunityServiceError where error.isAuthenticationFailure {
+            clearSession()
+            throw error
+        } catch {
+            errorText = "抽卡失败，请稍后重试 / Card draw failed"
+            throw error
+        }
     }
 
     func logout() {
@@ -557,11 +854,20 @@ final class CommunityAccountStore: ObservableObject {
     private func clearSession() {
         invalidatePendingWork(sendStop: false)
         account = nil
+#if POKER_FEATURE
+        pokerStatus = nil
+#endif
+        shuihuStatus = nil
         token = nil
         activeSeconds = 0
         leaseVersion = 0
         isRestoring = false
         isSigningIn = false
+        isLinkingLogin = false
+#if POKER_FEATURE
+        isPokerSyncing = false
+#endif
+        isShuihuSyncing = false
         restoreOperationID = nil
         signInOperationID = nil
         try? tokenStore.delete()
@@ -669,9 +975,30 @@ final class CommunityMessageStore: ObservableObject {
     }
 }
 
-private final class CommunityTokenStore {
-    private let service = "com.lynncat.codexpilot.community"
-    private let account = "primary-session"
+final class CommunityTokenStore {
+#if SCREENSHOT_BUILD
+    static let service = "com.lynncat.codexpilot.community.review-screenshot"
+    static let usesDataProtectionKeychain = true
+#elseif DIRECT_DISTRIBUTION
+    static let service = "com.lynncat.codexpilot.community.direct"
+    static let usesDataProtectionKeychain = false
+#else
+    static let service = "com.lynncat.codexpilot.community"
+    static let usesDataProtectionKeychain = true
+#endif
+    private let service: String
+    private let account: String
+    private let usesDataProtectionKeychain: Bool
+
+    init(
+        service: String? = nil,
+        account: String = "primary-session",
+        usesDataProtectionKeychain: Bool? = nil
+    ) {
+        self.service = service ?? Self.service
+        self.account = account
+        self.usesDataProtectionKeychain = usesDataProtectionKeychain ?? Self.usesDataProtectionKeychain
+    }
 
     func read() throws -> String? {
         var query = baseQuery
@@ -695,7 +1022,9 @@ private final class CommunityTokenStore {
         guard update == errSecItemNotFound else { throw CommunityServiceError.keychain(update) }
         var item = baseQuery
         item[kSecValueData as String] = data
-        item[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+        if usesDataProtectionKeychain {
+            item[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+        }
         let add = SecItemAdd(item as CFDictionary, nil)
         guard add == errSecSuccess else { throw CommunityServiceError.keychain(add) }
     }
@@ -706,11 +1035,36 @@ private final class CommunityTokenStore {
     }
 
     private var baseQuery: [String: Any] {
-        [
+        Self.query(
+            service: service,
+            account: account,
+            usesDataProtectionKeychain: usesDataProtectionKeychain
+        )
+    }
+
+    static func query(account: String) -> [String: Any] {
+        query(
+            service: service,
+            account: account,
+            usesDataProtectionKeychain: usesDataProtectionKeychain
+        )
+    }
+
+    static func query(
+        service: String,
+        account: String,
+        usesDataProtectionKeychain: Bool
+    ) -> [String: Any] {
+        var query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecAttrAccount as String: account,
         ]
+        if usesDataProtectionKeychain {
+            // App Store builds use the entitlement-backed keychain and avoid legacy ACL prompts.
+            query[kSecUseDataProtectionKeychain as String] = true
+        }
+        return query
     }
 }
 

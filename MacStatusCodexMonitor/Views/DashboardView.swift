@@ -73,6 +73,27 @@ private extension EnvironmentValues {
 private enum DashboardPage {
     case cockpit
     case community
+#if DIRECT_DISTRIBUTION
+    case poker
+#endif
+    case shuihuCards
+}
+
+struct SessionUptimeFormatter {
+    static func string(startedAt: Date, now: Date) -> String {
+        let totalMinutes = max(0, Int(now.timeIntervalSince(startedAt) / 60))
+        let days = totalMinutes / (24 * 60)
+        let hours = (totalMinutes % (24 * 60)) / 60
+        let minutes = totalMinutes % 60
+
+        if days > 0 {
+            return "启动后计时 \(days)天 \(hours)小时 \(minutes)分 / Session \(days)d \(hours)h \(minutes)m"
+        }
+        if hours > 0 {
+            return "启动后计时 \(hours)小时 \(minutes)分 / Session \(hours)h \(minutes)m"
+        }
+        return "启动后计时 \(minutes)分钟 / Session \(minutes)m"
+    }
 }
 
 struct DashboardView: View {
@@ -86,10 +107,11 @@ struct DashboardView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: selectedPage == .cockpit ? 16 : 8) {
                 headerBand
 
-                if selectedPage == .cockpit {
+                switch selectedPage {
+                case .cockpit:
                     HStack(alignment: .top, spacing: 14) {
                         systemHealthColumn
                             .frame(minWidth: 220, maxWidth: 260, alignment: .top)
@@ -98,10 +120,22 @@ struct DashboardView: View {
                         codexColumn
                             .frame(minWidth: 260, maxWidth: 300, alignment: .top)
                     }
-
-                    cacheColumn
-                } else {
+                case .community:
                     CommunityView()
+#if DIRECT_DISTRIBUTION
+                case .poker:
+                    PokerGameView {
+                        withAnimation(.easeInOut(duration: 0.18)) {
+                            selectedPage = .community
+                        }
+                    }
+#endif
+                case .shuihuCards:
+                    ShuihuCardGameView {
+                        withAnimation(.easeInOut(duration: 0.18)) {
+                            selectedPage = .community
+                        }
+                    }
                 }
             }
             .padding(18)
@@ -114,19 +148,21 @@ struct DashboardView: View {
     }
 
     private var headerBand: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .firstTextBaseline) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(sportThemeEnabled ? "CodexPilot Sport Cockpit" : "Codex 驾驶舱 / CodexPilot")
-                        .font(.largeTitle)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(theme.text)
-                    Text("采样时间 / Sample \(sampleTimeValue)  |  \(resetContext)")
-                        .font(.callout)
-                        .foregroundStyle(theme.secondaryText)
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 8) {
+                HStack(spacing: 2) {
+                    dashboardPageButton(title: "驾驶舱 / Cockpit", systemImage: "gauge.with.dots.needle.bottom.50percent", page: .cockpit)
+                    dashboardPageButton(title: "用户交流 / Community", systemImage: "person.2.fill", page: .community)
+#if DIRECT_DISTRIBUTION
+                    dashboardPageButton(title: "积分牌桌 / Poker", systemImage: "suit.spade.fill", page: .poker)
+#endif
+                    dashboardPageButton(title: "水浒卡册 / Cards", systemImage: "rectangle.stack.fill", page: .shuihuCards)
                 }
+                .padding(2)
+                .background(theme.panelRaised.opacity(0.76), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).stroke(theme.hairline, lineWidth: 1))
 
-                Spacer()
+                Spacer(minLength: 10)
 
                 HStack(spacing: 2) {
                     themeModeButton(title: "Normal 模式", systemImage: "macwindow", sportMode: false)
@@ -141,25 +177,8 @@ struct DashboardView: View {
                 )
                 .help("切换主界面主题 / Toggle dashboard theme")
 
-                Text(theme.modeLabel)
-                    .font(.caption)
-                    .fontWeight(.bold)
-                    .foregroundStyle(theme.overlayAccent)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(theme.carbon, in: Capsule())
-
                 StatusDot(label: "运行中 / Active", color: .green)
             }
-
-            HStack(spacing: 2) {
-                dashboardPageButton(title: "驾驶舱 / Cockpit", systemImage: "gauge.with.dots.needle.bottom.50percent", page: .cockpit)
-                dashboardPageButton(title: "用户交流 / Community", systemImage: "person.2.fill", page: .community)
-                Spacer(minLength: 0)
-            }
-            .padding(2)
-            .background(theme.panelRaised.opacity(0.76), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).stroke(theme.hairline, lineWidth: 1))
 
             if selectedPage == .cockpit {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 145), spacing: 10)], spacing: 10) {
@@ -214,7 +233,14 @@ struct DashboardView: View {
                 }
             }
         }
-        .padding(16)
+        .padding(
+            EdgeInsets(
+                top: 8,
+                leading: 10,
+                bottom: selectedPage == .cockpit ? 12 : 8,
+                trailing: 10
+            )
+        )
         .background(theme.carbon, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
         .overlay(
             ZStack {
@@ -330,97 +356,49 @@ struct DashboardView: View {
 
     private var diskAnalysisColumn: some View {
         VStack(alignment: .leading, spacing: 12) {
-            StatusCenterPanel(title: "硬盘分析 / Disk Analysis", subtitle: "容量与读写 / Capacity & I/O") {
-                VStack(spacing: 12) {
-                    MetricGauge(
-                        title: "硬盘使用 / Disk Used",
-                        value: PercentFormatterUtility.string(state.system.diskCapacity.usedPercent),
-                        percent: state.system.diskCapacity.usedPercent,
-                        detail: diskUsedDetail,
-                        tint: CockpitTheme.amber
-                    )
-
-                    HStack(spacing: 10) {
-                        StatusRow(
-                            title: "启动后增长 / Since Launch Growth",
-                            value: diskGrowthValue,
-                            detail: bilingualStatus(state.diskGrowth.statusText),
-                            color: diskGrowthColor
+            TimelineView(.periodic(from: state.sessionStartedAt, by: 60)) { context in
+                StatusCenterPanel(
+                    title: "硬盘分析 / Disk Analysis",
+                    subtitle: SessionUptimeFormatter.string(startedAt: state.sessionStartedAt, now: context.date)
+                ) {
+                    VStack(spacing: 12) {
+                        MetricGauge(
+                            title: "硬盘使用 / Disk Used",
+                            value: PercentFormatterUtility.string(state.system.diskCapacity.usedPercent),
+                            percent: state.system.diskCapacity.usedPercent,
+                            detail: diskUsedDetail,
+                            tint: CockpitTheme.amber
                         )
-                    }
 
-                    Divider()
+                        HStack(spacing: 10) {
+                            StatusRow(
+                                title: "启动后增长 / Since Launch Growth",
+                                value: diskGrowthValue,
+                                detail: bilingualStatus(state.diskGrowth.statusText),
+                                color: diskGrowthColor
+                            )
+                        }
 
-                    HStack(spacing: 10) {
-                        StatusRow(
-                            title: "启动后读取 / Since Launch Read",
-                            value: diskRead24hValue,
-                            detail: readRateDetail,
-                            color: CockpitTheme.cyan
-                        )
-                        StatusRow(
-                            title: "启动后写入 / Since Launch Write",
-                            value: diskWrite24hValue,
-                            detail: writeRateDetail,
-                            color: CockpitTheme.redline
-                        )
+                        Divider()
+
+                        HStack(spacing: 10) {
+                            StatusRow(
+                                title: "启动后读取 / Since Launch Read",
+                                value: diskRead24hValue,
+                                detail: readRateDetail,
+                                color: CockpitTheme.cyan
+                            )
+                            StatusRow(
+                                title: "启动后写入 / Since Launch Write",
+                                value: diskWrite24hValue,
+                                detail: writeRateDetail,
+                                color: CockpitTheme.redline
+                            )
+                        }
                     }
                 }
             }
             .frame(height: 358, alignment: .top)
-        }
-    }
-
-    private var cacheColumn: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            StatusCenterPanel(title: "缓存清理 / Cache", subtitle: "缓存增长与清理 / Growth & cleanup") {
-                VStack(spacing: 12) {
-                    HStack(alignment: .center, spacing: 10) {
-                        HStack(spacing: 10) {
-                            StatusRow(
-                                title: "缓存增长 / Cache Growth",
-                                value: cacheGrowthValue,
-                                detail: cacheGrowthDetailBilingual,
-                                color: cacheGrowthColor
-                            )
-                            StatusRow(
-                                title: "缓存总量 / Cache Total",
-                            value: ByteFormatterUtility.string(bytes: state.cacheEstimate.totalBytes),
-                            detail: "可读缓存估算 / Readable cache estimate",
-                            color: CockpitTheme.amber
-                        )
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-
-                        Button(action: {
-                            state.cleanCache()
-                        }) {
-                            Label(cleanCacheTitle, systemImage: "trash")
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.75)
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .tint(CockpitTheme.redline)
-                        .controlSize(.small)
-                        .disabled(state.isCleaningCache)
-                    }
-
-                    if state.cacheEstimate.entries.isEmpty {
-                        StatusRow(
-                            title: "缓存目录 / Cache Paths",
-                            value: "无数据 / No data",
-                            detail: "等待下一次扫描 / Waiting for scan",
-                            color: .secondary
-                        )
-                    } else {
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 220), spacing: 8)], spacing: 8) {
-                            ForEach(state.cacheEstimate.entries.prefix(5)) { entry in
-                                CacheDirectoryRow(path: entry.path, bytes: ByteFormatterUtility.string(bytes: entry.bytes))
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -451,15 +429,6 @@ struct DashboardView: View {
                         detail: "计划 / Plan: \(state.codexQuota.planType ?? "Not reported")",
                         color: .blue
                     )
-
-                    Button(action: { state.chooseCodexLogDirectory() }) {
-                        Label("授权日志目录 / Authorize Logs", systemImage: "folder.badge.gearshape")
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.78)
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(CockpitTheme.amber)
-                    .controlSize(.small)
                 }
             }
             .frame(height: 358, alignment: .top)
@@ -582,33 +551,8 @@ struct DashboardView: View {
         return "实时写入 / Live write \(rate)"
     }
 
-    private var cacheGrowthValue: String {
-        guard let growth = state.cacheEstimate.growthBytes24h else {
-            return "学习中 / Learning"
-        }
-        return ByteFormatterUtility.signedString(bytes: growth)
-    }
-
-    private var cacheGrowthColor: Color {
-        guard let growth = state.cacheEstimate.growthBytes24h else {
-            return .secondary
-        }
-        return growth > 0 ? CockpitTheme.amber : CockpitTheme.green
-    }
-
-    private var cacheGrowthDetailBilingual: String {
-        if let share = state.cacheEstimate.growthShareOfDiskGrowth {
-            return "\(bilingualStatus(state.cacheEstimate.statusText)) / \(PercentFormatterUtility.string(share)) 硬盘增长 / disk growth"
-        }
-        return bilingualStatus(state.cacheEstimate.statusText)
-    }
-
     private var resetValue: String {
         state.codexQuota.resetsAt?.formatted(date: .abbreviated, time: .shortened) ?? "未报告 / Not reported"
-    }
-
-    private var cleanCacheTitle: String {
-        state.isCleaningCache ? "清理中 / Cleaning" : "清理缓存 / Clean"
     }
 
     private func bilingualStatus(_ text: String) -> String {
@@ -627,24 +571,14 @@ struct DashboardView: View {
             return "暂无硬盘历史 / No disk history yet"
         case "No disk I/O history yet":
             return "暂无读写历史 / No disk I/O history yet"
-        case "No cache history yet":
-            return "暂无缓存历史 / No cache history yet"
         case "24h history ready":
             return "24小时历史就绪 / 24h history ready"
         case "24h I/O history ready":
             return "24小时读写历史就绪 / 24h I/O history ready"
-        case "24h cache history ready":
-            return "24小时缓存历史就绪 / 24h cache history ready"
         case "Since launch disk history ready":
             return "本次启动硬盘历史就绪 / Since launch disk history ready"
         case "Since launch I/O ready":
             return "本次启动读写就绪 / Since launch I/O ready"
-        case "Since launch cache history ready":
-            return "本次启动缓存历史就绪 / Since launch cache history ready"
-        case "Cache cleaned":
-            return "缓存已清理 / Cache cleaned"
-        case "Cache clean incomplete":
-            return "缓存清理未完成 / Cache clean incomplete"
         case "Disk I/O counters reset":
             return "磁盘计数已重置 / Disk I/O counters reset"
         case "Disk I/O counters unavailable":
@@ -1097,32 +1031,6 @@ private struct SparklineView: View {
         let x = size.width * CGFloat(index) / CGFloat(denominator)
         let y = size.height * CGFloat(1 - value)
         return CGPoint(x: x, y: y)
-    }
-}
-
-private struct CacheDirectoryRow: View {
-    @Environment(\.dashboardTheme) private var theme
-
-    var path: String
-    var bytes: String
-
-    var body: some View {
-        HStack(spacing: 8) {
-            Text(path)
-                .font(.caption)
-                .foregroundStyle(theme.text)
-                .lineLimit(1)
-                .truncationMode(.middle)
-            Spacer()
-            Text(bytes)
-                .font(.caption)
-                .fontWeight(.medium)
-                .foregroundStyle(theme.secondaryText)
-                .lineLimit(1)
-        }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 7)
-        .background(theme.panelRaised.opacity(0.5), in: RoundedRectangle(cornerRadius: 6, style: .continuous))
     }
 }
 

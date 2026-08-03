@@ -14,6 +14,23 @@ final class AppStateTests: XCTestCase {
         super.tearDown()
     }
 
+    func testSessionUptimeFormatterReportsMinutesHoursAndDays() {
+        let startedAt = Date(timeIntervalSince1970: 1_000)
+
+        XCTAssertEqual(
+            SessionUptimeFormatter.string(startedAt: startedAt, now: startedAt.addingTimeInterval(59)),
+            "启动后计时 0分钟 / Session 0m"
+        )
+        XCTAssertEqual(
+            SessionUptimeFormatter.string(startedAt: startedAt, now: startedAt.addingTimeInterval(2 * 3600 + 17 * 60)),
+            "启动后计时 2小时 17分 / Session 2h 17m"
+        )
+        XCTAssertEqual(
+            SessionUptimeFormatter.string(startedAt: startedAt, now: startedAt.addingTimeInterval(26 * 3600 + 3 * 60)),
+            "启动后计时 1天 2小时 3分 / Session 1d 2h 3m"
+        )
+    }
+
     func testAppLaunchShowsDashboardAndActivatesApp() {
         let activated = expectation(description: "activated")
         activated.expectedFulfillmentCount = 2
@@ -25,14 +42,6 @@ final class AppStateTests: XCTestCase {
             diskStore: StubDiskGrowthStore(
                 growthSummary: DiskGrowthSummary(latest: nil, baseline: nil, growthBytes: nil, observedHours: 0, statusText: "none")
             ),
-            cacheStore: StubCacheGrowthStore(summaryResult: CacheGrowthSummary(
-                latest: nil,
-                baseline: nil,
-                growthBytes: nil,
-                observedHours: 0,
-                statusText: "cache"
-            )),
-            cacheAnalyzer: StubCacheAnalyzer(result: CacheEstimate(totalBytes: 0, entries: [], scannedAt: Date(), statusText: "none")),
             codexReader: StubCodexQuotaReader(result: CodexQuotaSnapshot(
                 sourceDescription: "Not reported",
                 freshness: nil,
@@ -74,14 +83,6 @@ final class AppStateTests: XCTestCase {
             diskStore: StubDiskGrowthStore(
                 growthSummary: DiskGrowthSummary(latest: nil, baseline: nil, growthBytes: nil, observedHours: 0, statusText: "none")
             ),
-            cacheStore: StubCacheGrowthStore(summaryResult: CacheGrowthSummary(
-                latest: nil,
-                baseline: nil,
-                growthBytes: nil,
-                observedHours: 0,
-                statusText: "cache"
-            )),
-            cacheAnalyzer: StubCacheAnalyzer(result: CacheEstimate(totalBytes: 0, entries: [], scannedAt: Date(), statusText: "none")),
             codexReader: StubCodexQuotaReader(result: .unavailable)
         )
         let delegate = AppDelegate(state: state, appActivationSink: {})
@@ -129,14 +130,6 @@ final class AppStateTests: XCTestCase {
             diskStore: StubDiskGrowthStore(
                 growthSummary: DiskGrowthSummary(latest: nil, baseline: nil, growthBytes: nil, observedHours: 0, statusText: "none")
             ),
-            cacheStore: StubCacheGrowthStore(summaryResult: CacheGrowthSummary(
-                latest: nil,
-                baseline: nil,
-                growthBytes: nil,
-                observedHours: 0,
-                statusText: "cache"
-            )),
-            cacheAnalyzer: StubCacheAnalyzer(result: CacheEstimate(totalBytes: 0, entries: [], scannedAt: Date(), statusText: "none")),
             codexReader: StubCodexQuotaReader(result: refreshedQuota)
         )
         let delegate = AppDelegate(state: state, statusTitleSink: { title in
@@ -171,14 +164,6 @@ final class AppStateTests: XCTestCase {
             diskStore: StubDiskGrowthStore(
                 growthSummary: DiskGrowthSummary(latest: nil, baseline: nil, growthBytes: nil, observedHours: 0, statusText: "none")
             ),
-            cacheStore: StubCacheGrowthStore(summaryResult: CacheGrowthSummary(
-                latest: nil,
-                baseline: nil,
-                growthBytes: nil,
-                observedHours: 0,
-                statusText: "cache"
-            )),
-            cacheAnalyzer: StubCacheAnalyzer(result: CacheEstimate(totalBytes: 0, entries: [], scannedAt: Date(), statusText: "none")),
             codexReader: StubCodexQuotaReader(result: CodexQuotaSnapshot(
                 sourceDescription: "local",
                 freshness: Date(timeIntervalSince1970: 10),
@@ -240,8 +225,6 @@ final class AppStateTests: XCTestCase {
             diskStore: StubDiskGrowthStore(
                 growthSummary: DiskGrowthSummary(latest: nil, baseline: nil, growthBytes: nil, observedHours: 0, statusText: "none")
             ),
-            cacheStore: StubCacheGrowthStore(),
-            cacheAnalyzer: StubCacheAnalyzer(result: CacheEstimate(totalBytes: 0, entries: [], scannedAt: Date(), statusText: "none")),
             codexReader: StubCodexQuotaReader(result: CodexQuotaSnapshot(
                 sourceDescription: "local",
                 freshness: Date(timeIntervalSince1970: 10),
@@ -278,7 +261,7 @@ final class AppStateTests: XCTestCase {
 
     func testRefreshRunsHeavyWorkOffMainActorAndPublishesSnapshot() async {
         let workRanOffMainActor = expectation(description: "workRanOffMainActor")
-        workRanOffMainActor.expectedFulfillmentCount = 3
+        workRanOffMainActor.expectedFulfillmentCount = 2
 
         let updated = expectation(description: "updated")
         let initialSnapshot = makeSystemSnapshot(
@@ -315,12 +298,6 @@ final class AppStateTests: XCTestCase {
             growthBytes: 25,
             observedHours: 2,
             statusText: "ready"
-        )
-        let expectedCache = CacheEstimate(
-            totalBytes: 512,
-            entries: [CacheEstimate.Entry(path: "/tmp/cache", bytes: 512)],
-            scannedAt: refreshedSnapshot.timestamp,
-            statusText: "cache"
         )
         let expectedQuota = CodexQuotaSnapshot(
             sourceDescription: "local",
@@ -360,17 +337,6 @@ final class AppStateTests: XCTestCase {
                     workRanOffMainActor.fulfill()
                 }
             ),
-            cacheStore: StubCacheGrowthStore(summaryResult: CacheGrowthSummary(
-                latest: nil,
-                baseline: nil,
-                growthBytes: nil,
-                observedHours: 0,
-                statusText: "cache"
-            )),
-            cacheAnalyzer: StubCacheAnalyzer(result: expectedCache, hook: {
-                XCTAssertFalse(Thread.isMainThread)
-                workRanOffMainActor.fulfill()
-            }),
             codexReader: StubCodexQuotaReader(result: expectedQuota)
         )
 
@@ -393,11 +359,6 @@ final class AppStateTests: XCTestCase {
         XCTAssertEqual(state.system.cpuUsage ?? -1, 40, accuracy: 0.001)
         XCTAssertEqual(state.diskGrowth.growthBytes, 200)
         XCTAssertEqual(state.diskGrowth.statusText, "Since launch disk history ready")
-        XCTAssertEqual(state.cacheEstimate.totalBytes, expectedCache.totalBytes)
-        XCTAssertEqual(state.cacheEstimate.entries, expectedCache.entries)
-        XCTAssertEqual(state.cacheEstimate.scannedAt, expectedCache.scannedAt)
-        XCTAssertEqual(state.cacheEstimate.growthBytes24h, 0)
-        XCTAssertEqual(state.cacheEstimate.statusText, "Since launch cache history ready")
         XCTAssertEqual(state.codexQuota.limitID, expectedQuota.limitID)
         XCTAssertEqual(state.dashboardTrendSamples.map(\.timestamp), [initialSnapshot.timestamp, refreshedSnapshot.timestamp])
         XCTAssertEqual(state.dashboardTrendSamples.last?.cpuUsage, 40)
@@ -455,8 +416,6 @@ final class AppStateTests: XCTestCase {
                 growthSummary: DiskGrowthSummary(latest: nil, baseline: nil, growthBytes: nil, observedHours: 0, statusText: "none")
             ),
             diskIOStore: StubDiskIOHistoryStore(summary: ioSummary),
-            cacheStore: StubCacheGrowthStore(),
-            cacheAnalyzer: StubCacheAnalyzer(result: CacheEstimate(totalBytes: 0, entries: [], scannedAt: Date(), statusText: "none")),
             codexReader: StubCodexQuotaReader(result: .unavailable)
         )
 
@@ -480,86 +439,6 @@ final class AppStateTests: XCTestCase {
         XCTAssertEqual(state.system.diskIO.readBytesPerSecond, 60)
         XCTAssertEqual(state.system.diskIO.writeBytesPerSecond, 90)
         XCTAssertEqual(state.system.diskIO.sourceDescription, "Since launch I/O ready")
-    }
-
-    func testCleanCacheRunsAnalyzerAndPublishesCleanStatus() async {
-        let cleaned = expectation(description: "cleaned")
-        let updated = expectation(description: "updated")
-        let cleanedAt = Date(timeIntervalSince1970: 30)
-        let state = AppState(
-            systemMonitor: StubSystemMonitor(snapshots: [
-                makeSystemSnapshot(timestamp: Date(timeIntervalSince1970: 10), cpuUsage: 10),
-                makeSystemSnapshot(timestamp: Date(timeIntervalSince1970: 30), cpuUsage: 12)
-            ]),
-            diskStore: StubDiskGrowthStore(
-                growthSummary: DiskGrowthSummary(latest: nil, baseline: nil, growthBytes: nil, observedHours: 0, statusText: "none")
-            ),
-            cacheStore: StubCacheGrowthStore(),
-            cacheAnalyzer: StubCacheAnalyzer(
-                result: CacheEstimate(totalBytes: 0, entries: [], scannedAt: cleanedAt, statusText: "User-cache estimate"),
-                cleanResult: CacheCleanResult(removedBytes: 2_048, removedItemCount: 2, failures: []),
-                cleanHook: {
-                    cleaned.fulfill()
-                }
-            ),
-            codexReader: StubCodexQuotaReader(result: .unavailable)
-        )
-
-        state.cleanCache()
-
-        Task {
-            while true {
-                if state.cacheEstimate.statusText == "Cache cleaned" {
-                    updated.fulfill()
-                    break
-                }
-                try? await Task.sleep(nanoseconds: 10_000_000)
-            }
-        }
-
-        await fulfillment(of: [cleaned, updated], timeout: 2.0)
-
-        XCTAssertEqual(state.cacheEstimate.totalBytes, 0)
-        XCTAssertEqual(state.cacheEstimate.scannedAt, cleanedAt)
-    }
-
-    func testCleanCacheReportsPartialFailure() async {
-        let updated = expectation(description: "updated")
-        let state = AppState(
-            systemMonitor: StubSystemMonitor(snapshots: [
-                makeSystemSnapshot(timestamp: Date(timeIntervalSince1970: 10), cpuUsage: 10),
-                makeSystemSnapshot(timestamp: Date(timeIntervalSince1970: 30), cpuUsage: 12)
-            ]),
-            diskStore: StubDiskGrowthStore(
-                growthSummary: DiskGrowthSummary(latest: nil, baseline: nil, growthBytes: nil, observedHours: 0, statusText: "none")
-            ),
-            cacheStore: StubCacheGrowthStore(),
-            cacheAnalyzer: StubCacheAnalyzer(
-                result: CacheEstimate(totalBytes: 1_024, entries: [], scannedAt: Date(timeIntervalSince1970: 30), statusText: "User-cache estimate"),
-                cleanResult: CacheCleanResult(
-                    removedBytes: 0,
-                    removedItemCount: 0,
-                    failures: [CacheCleanResult.Failure(path: "/tmp/cache", message: "denied")]
-                )
-            ),
-            codexReader: StubCodexQuotaReader(result: .unavailable)
-        )
-
-        state.cleanCache()
-
-        Task {
-            while true {
-                if state.cacheEstimate.statusText == "Cache clean incomplete" {
-                    updated.fulfill()
-                    break
-                }
-                try? await Task.sleep(nanoseconds: 10_000_000)
-            }
-        }
-
-        await fulfillment(of: [updated], timeout: 2.0)
-
-        XCTAssertEqual(state.cacheEstimate.totalBytes, 1_024)
     }
 
     func testRefreshSkipsOverlappingWork() async {
@@ -588,8 +467,6 @@ final class AppStateTests: XCTestCase {
             diskStore: StubDiskGrowthStore(
                 growthSummary: DiskGrowthSummary(latest: nil, baseline: nil, growthBytes: nil, observedHours: 0, statusText: "none")
             ),
-            cacheStore: StubCacheGrowthStore(),
-            cacheAnalyzer: StubCacheAnalyzer(result: CacheEstimate(totalBytes: 0, entries: [], scannedAt: Date(), statusText: "none")),
             codexReader: StubCodexQuotaReader(result: .unavailable)
         )
 
@@ -685,42 +562,6 @@ private struct StubDiskIOHistoryStore: DiskIOHistoryStoring {
 
     func summary(now: Date) -> DiskIOHistorySummary {
         summary
-    }
-}
-
-private struct StubCacheGrowthStore: CacheGrowthStoring {
-    var summaryResult = CacheGrowthSummary(
-        latest: nil,
-        baseline: nil,
-        growthBytes: nil,
-        observedHours: 0,
-        statusText: "cache history"
-    )
-    var recordHook: @Sendable (CacheSnapshot) throws -> Void = { _ in }
-
-    func record(_ snapshot: CacheSnapshot) throws {
-        try recordHook(snapshot)
-    }
-
-    func summary(now: Date) -> CacheGrowthSummary {
-        summaryResult
-    }
-}
-
-private struct StubCacheAnalyzer: CacheAnalyzing {
-    var result: CacheEstimate
-    var cleanResult = CacheCleanResult(removedBytes: 0, removedItemCount: 0, failures: [])
-    var hook: @Sendable () -> Void = {}
-    var cleanHook: @Sendable () -> Void = {}
-
-    func estimate() -> CacheEstimate {
-        hook()
-        return result
-    }
-
-    func clean() throws -> CacheCleanResult {
-        cleanHook()
-        return cleanResult
     }
 }
 

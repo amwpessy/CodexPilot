@@ -65,9 +65,9 @@ struct MenuBarPopoverView: View {
             .frame(width: 32, height: 32)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text("Codex 驾驶舱")
+                Text("林猫驾驶舱")
                     .font(.headline)
-                Text("CodexPilot")
+                Text("Lynncat Pilot")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }

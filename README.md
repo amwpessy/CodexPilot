@@ -1,25 +1,33 @@
-# Mac Status Codex Monitor
+# Lynncat Pilot / 林猫驾驶舱
 
-Native macOS menu bar app for monitoring Mac status and local Codex quota signals.
+Lynncat Pilot is a native macOS status cockpit for developers using Codex on Mac. It combines local quota signals, system health, disk activity, a menu bar display, and Touch Bar status in one bilingual app.
 
-## Open in Xcode
+## Version 1.4
 
-Open `MacStatusCodexMonitor.xcodeproj`.
+- Monitor CPU, memory, battery, disk usage, disk growth, and live disk I/O.
+- Show supported Codex quota signals in the dashboard, menu bar, and Touch Bar.
+- Switch between a light Normal mode and a one-second Sport mode.
+- Join the optional Lynncat community with Apple or Lynncat account login.
+- Earn participation points and collect all 108 Water Margin hero cards.
+- Use the entertainment-only points Poker table in the Direct edition.
+- Build separate App Store and notarized Direct editions from the same Xcode project.
 
-## Notes
+Quota data depends on compatible events being readable from local Codex session logs. When no compatible event is available, the app reports that the quota is not available.
 
-- Codex quota comes from local `~/.codex/sessions/**/*.jsonl` `rate_limits` events.
-- Reset-card and secondary quota details are shown when those fields are present in local Codex events; otherwise they are labeled as not reported.
-- GPU utilization may show unavailable because macOS does not provide a stable public utilization API for this app.
-- The app refreshes periodically while running in the menu bar; the default cadence is two minutes to avoid excessive cache-directory scanning.
-- Disk growth, disk I/O, and cache-growth attribution start tracking from the first app launch and need about 24 hours of local history before the 24h fields become ready.
-- Cache size is an estimate of user-readable cache-like directories. The app estimates 24h cache-like growth but does not delete files.
-- In this Codex sandbox, `xcodebuild test` may be blocked by `com.apple.testmanagerd.control`; `build` and `build-for-testing` still verify project wiring.
+## Open In Xcode
+
+Open `MacStatusCodexMonitor.xcodeproj`, then choose one of the shared schemes:
+
+- `MacStatusCodexMonitor`: App Store edition.
+- `Lynncat Pilot Direct`: direct-download edition with the points Poker table.
 
 ## Verification
 
-With full Xcode selected:
-
 ```bash
-xcodebuild test -project MacStatusCodexMonitor.xcodeproj -scheme MacStatusCodexMonitor -destination 'platform=macOS'
+xcodebuild test \
+  -project MacStatusCodexMonitor.xcodeproj \
+  -scheme MacStatusCodexMonitor \
+  -destination 'platform=macOS,arch=arm64'
 ```
+
+The project requires Xcode 26 or later and targets macOS 13 or later.

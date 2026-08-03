@@ -69,8 +69,6 @@ final class TouchBarControllerTests: XCTestCase {
         let state = AppState(
             systemMonitor: StubTouchBarSystemMonitor(snapshots: [initialSystem, refreshedSystem]),
             diskStore: StubTouchBarDiskGrowthStore(growthSummaries: [initialDiskGrowth, refreshedDiskGrowth]),
-            cacheStore: StubTouchBarCacheGrowthStore(),
-            cacheAnalyzer: StubTouchBarCacheAnalyzer(),
             codexReader: StubTouchBarCodexQuotaReader(result: quota),
             refreshQueue: DispatchQueue(label: "TouchBarControllerTests.refresh")
         )
@@ -172,30 +170,6 @@ private final class StubTouchBarDiskGrowthStore: DiskGrowthStoring {
 
     func growthSummary(now: Date) -> DiskGrowthSummary {
         growthSummaries.withLock { $0.removeFirst() }
-    }
-}
-
-private struct StubTouchBarCacheGrowthStore: CacheGrowthStoring {
-    func record(_ snapshot: CacheSnapshot) throws {}
-
-    func summary(now: Date) -> CacheGrowthSummary {
-        CacheGrowthSummary(
-            latest: nil,
-            baseline: nil,
-            growthBytes: nil,
-            observedHours: 0,
-            statusText: "none"
-        )
-    }
-}
-
-private struct StubTouchBarCacheAnalyzer: CacheAnalyzing {
-    func estimate() -> CacheEstimate {
-        CacheEstimate(totalBytes: 0, entries: [], scannedAt: Date(), statusText: "none")
-    }
-
-    func clean() throws -> CacheCleanResult {
-        CacheCleanResult(removedBytes: 0, removedItemCount: 0, failures: [])
     }
 }
 

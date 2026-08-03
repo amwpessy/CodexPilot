@@ -3,3 +3,6 @@
 .swift-module-cache/
 xcuserdata/
 *.xcuserstate
+.DS_Store
+MacStatusCodexMonitor/pic/
+docs/app-store/screenshots-review/

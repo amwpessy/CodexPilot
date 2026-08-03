@@ -1,44 +1,66 @@
-# CodexPilot / Codex 驾驶舱 App Store 上架资料
+# Lynncat Pilot / 林猫驾驶舱 App Store 上架资料
 
-> Version: 1.0 submission draft
-> Primary audience: Mac users who actively use Codex and need a local quota, disk I/O, and cache cockpit.
-> Positioning: independent local macOS utility for Codex users. Not affiliated with OpenAI.
+> Version: 1.4 (7)
+> Primary audience: developers who need local coding-quota, disk I/O, and system monitoring.
+> Public brand: Lynncat Pilot. Bundle ID remains `com.lynncat.codexpilot`.
 
-## App Store Connect 基本信息 / Basic Information
+## Review Remediation / 审核整改
+
+1. Guideline 4.1(c)
+   - Changed the public app name from `CodexPilot` to the developer-owned brand `Lynncat Pilot`.
+   - Changed the Simplified Chinese name to `林猫驾驶舱`.
+   - Removed `Codex` from the app name and subtitle.
+   - Kept the existing Bundle ID, as requested by App Review.
+
+2. Guideline 5.2.5
+   - Removed `Mac` from both localized subtitles.
+   - Replaced product references in subtitles and keywords with functional descriptions.
+
+3. Guideline 5 / China mainland availability
+   - China mainland was deselected in App Store Connect under Pricing and Availability on July 24, 2026.
+   - App Store Connect reports the storefront transition as `Processing` to `Not Available`.
+   - Confirm in Review Notes that this version is not distributed in China mainland.
+
+4. Simulated gambling / individual developer eligibility
+   - Removed the Texas Hold'em points table and all Poker source files from the App Store `Release` configuration.
+   - The Mac App Store binary has no betting, wagering, casino, Poker, or other simulated-gambling content.
+   - The separately distributed and notarized Direct edition retains the entertainment-only points table and is not the binary submitted to App Store Connect.
+   - Update the App Store Connect age-rating questionnaire to `Simulated Gambling: None`.
+
+## App Store Connect Basic Information / 基本信息
 
 ### English Localization
 
 App Name:
-CodexPilot
+Lynncat Pilot
 
 Subtitle:
-Codex quota cockpit
+Developer usage cockpit
 
 Promotional Text:
-Track Codex quota, disk activity, cache growth, and Mac health from a native menu bar cockpit.
+Track coding quota signals, disk activity, and system health from a focused native desktop cockpit.
 
 Description:
-CodexPilot is a native macOS cockpit designed specifically for Mac users who work with Codex.
+Lynncat Pilot is a native developer cockpit for monitoring coding-assistant usage signals and computer health in one focused place.
 
-When Codex is running for long sessions, it can consume quota, read and write local files frequently, and leave behind large runtime caches. CodexPilot keeps these signals visible in one focused place, so you can understand what is happening on your Mac without digging through logs, system panels, or Terminal commands.
+During long development sessions, local tools can consume usage quota and read and write files frequently. Lynncat Pilot keeps these signals visible without requiring you to search through logs, system panels, or Terminal commands.
 
-CodexPilot helps you:
-- Track Codex remaining quota from local Codex session events when available
-- Watch quota changes from the dashboard, menu bar, and supported Touch Bar Macs
-- Monitor live disk read/write rates while Codex and other developer tools are active
-- See disk I/O totals and disk growth since the app was opened
-- Estimate cache generated during local development and Codex runs
-- Clean common user cache locations from a dedicated cache module
-- Monitor CPU, memory, disk usage, and battery status in a native macOS interface
-- Switch between a calm Normal dashboard and a faster Sport cockpit with one-second refresh
+Lynncat Pilot helps you:
+- Track remaining quota from supported local coding-session events when available
+- Watch quota changes from the dashboard, menu bar, and supported Touch Bar devices
+- Monitor live disk read and write rates while development tools are active
+- See disk I/O totals, disk growth, and precise session duration since launch
+- Monitor CPU, memory, disk usage, and battery status
+- Switch between a calm Normal dashboard and a Sport cockpit with one-second refresh
+- Optionally sign in with Apple to join the user community, earn participation points, and appear on the leaderboard
+- Collect all 108 Water Margin heroes through an equal-odds card collection using participation points
 
-CodexPilot is built for local-first use. It reads system metrics, disk counters, cache locations, and local Codex session logs on your Mac. It does not require a cloud account and does not upload your Codex logs or Mac monitoring data.
+Monitoring is local-first. System metrics, disk counters, and readable local session logs remain on your computer. An account is optional and is used only for community, points, leaderboard, and card collection features; monitoring does not require sign-in.
 
-Important notes:
-Codex quota information depends on quota-related events written by your local Codex installation. If Codex does not expose a quota event in local logs, CodexPilot will show quota as not reported. CodexPilot is an independent utility and is not affiliated with OpenAI.
+Quota information depends on events written by a supported local coding assistant. When a compatible quota event is unavailable, the app clearly reports that no quota information was found.
 
 Keywords:
-Codex,quota,Mac,developer,monitor,disk,cache,menu bar,Touch Bar
+developer,quota,monitor,disk,system,menu bar,Touch Bar,usage
 
 Category:
 Developer Tools
@@ -47,50 +69,49 @@ Secondary Category:
 Utilities
 
 Support URL:
-TODO: Add support page URL
+https://lynncat.com/codexpilot/support.html
 
 Marketing URL:
-TODO: Add product page URL
+https://lynncat.com/codexpilot/
 
 Privacy Policy URL:
-TODO: Add hosted privacy policy URL
+https://lynncat.com/codexpilot/privacy.html
 
 Copyright:
-© 2026 TODO: Developer or Company Name
+© 2026 Lynncat
 
 ### 简体中文本地化 / Simplified Chinese Localization
 
 App 名称:
-Codex 驾驶舱
+林猫驾驶舱
 
 副标题:
-Codex 额度状态中枢
+开发额度与系统状态中枢
 
 宣传文本:
-为 Mac 上的 Codex 用户设计，随时跟踪剩余额度、硬盘读写、缓存增长与系统状态。
+在原生桌面驾驶舱中跟踪开发额度信号、硬盘读写与系统健康状态。
 
 描述:
-Codex 驾驶舱是专门为在 Mac 上使用 Codex 的用户设计的原生状态中枢。
+林猫驾驶舱是一款原生开发状态中枢，用于集中监控编码助手的额度信号与电脑健康状态。
 
-长时间运行 Codex 时，你通常会同时关心几件事：Codex 剩余额度还够不够、本地硬盘是否被频繁读写、运行过程中产生了多少缓存垃圾，以及 Mac 的 CPU、内存、硬盘和电池是否稳定。Codex 驾驶舱把这些信号集中到一个清晰的原生界面里，让你不用反复打开系统监视器、翻日志或执行命令。
+长时间开发时，本地工具可能持续消耗使用额度并频繁读写文件。林猫驾驶舱把这些信号集中在清晰的原生界面里，无需反复翻查日志、系统面板或终端命令。
 
-Codex 驾驶舱可以帮助你：
-- 在本地 Codex session 事件可用时，跟踪 Codex 剩余额度变化
-- 在主界面、菜单栏和支持的 Touch Bar 上随时查看 Codex 状态
-- 监控 Codex 与开发工具运行时的硬盘实时读取/写入速率
-- 统计从打开软件开始的硬盘读写总量和硬盘空间变化
-- 估算本地开发和 Codex 运行过程中产生的缓存
-- 通过独立缓存模块清理常见用户缓存目录中的缓存垃圾
+林猫驾驶舱可以帮助你：
+- 在受支持的本地编码会话事件可用时跟踪剩余额度
+- 在主界面、菜单栏和支持的 Touch Bar 设备上查看额度变化
+- 监控开发工具运行时的硬盘实时读取与写入速率
+- 统计从打开软件开始的硬盘读写总量、空间变化与精确运行时长
 - 同时查看 CPU、内存、硬盘使用率和电池状态
-- 在浅色 Normal 模式和 1 秒刷新一次的 Sport 码表模式之间切换
+- 在浅色 Normal 模式和每秒刷新的 Sport 码表模式之间切换
+- 可选择使用 Apple 登录，加入用户交流、累计参与积分并查看排行榜
+- 使用参与积分收集等概率出现的水浒一百单八将卡牌
 
-Codex 驾驶舱优先本地运行。它读取你的 Mac 系统指标、硬盘计数器、缓存目录和本地 Codex session 日志，不需要云端账号，也不会上传你的 Codex 日志或 Mac 监控数据。
+监控功能以本地优先方式运行。系统指标、硬盘计数器和可读取的本地会话日志保留在本机。账户为可选功能，只用于用户交流、积分、排行榜和卡册；监控功能无需登录。
 
-重要说明：
-Codex 额度信息取决于本机 Codex 是否在本地日志中写入额度事件。如果当前 Codex 版本没有暴露对应日志，应用会显示额度未报告。Codex 驾驶舱是一款独立工具，与 OpenAI 无隶属关系。
+额度信息取决于受支持的本地编码助手是否写入相关事件。如果当前没有兼容的额度事件，应用会明确显示未找到额度信息。
 
 关键词:
-Codex,额度,Mac,开发者,监控,硬盘,缓存,菜单栏,Touch Bar
+开发者,额度,监控,硬盘,系统,菜单栏,Touch Bar,用量
 
 类别:
 开发者工具
@@ -99,106 +120,125 @@ Codex,额度,Mac,开发者,监控,硬盘,缓存,菜单栏,Touch Bar
 工具
 
 支持 URL:
-TODO: 添加支持页面 URL
+https://lynncat.com/codexpilot/support.html
 
 营销 URL:
-TODO: 添加产品页面 URL
+https://lynncat.com/codexpilot/
 
 隐私政策 URL:
-TODO: 添加隐私政策 URL
+https://lynncat.com/codexpilot/privacy.html
 
 版权:
-© 2026 TODO: 开发者或公司名称
+© 2026 Lynncat
 
 ## Screenshot Plan / 截图规划
 
-Use 5 screenshots if possible.
+Use three updated screenshots. Every screenshot must show the new public name and the
+Poker-free App Store navigation.
 
 1. Main Normal dashboard
-   - EN caption: Codex quota and Mac health in one cockpit
-   - CN caption: Codex 额度与 Mac 状态中枢
-   - Show: light Normal dashboard, six top modules, system health, disk/cache, Codex quota column.
+   - EN caption: Quota and system health in one cockpit
+   - CN caption: 额度与系统状态集中呈现
+   - Show: light Normal dashboard, six top modules, system health, disk activity, and quota column.
 
-2. Sport cockpit
-   - EN caption: One-second Sport mode gauges
-   - CN caption: 1 秒刷新 Sport 码表模式
-   - Show: Sport mode top gauge modules for CPU, memory, disk, disk I/O, battery, and quota.
+2. User community
+   - EN caption: Optional community and participation points
+   - CN caption: 可选用户交流与参与积分
+   - Show: Sign in with Apple, public leaderboard, and moderated discussion.
 
-3. Disk I/O monitoring
-   - EN caption: See Codex-related disk activity
-   - CN caption: 监控 Codex 运行时硬盘读写
-   - Show: disk read/write module, live read/write rates, since-launch read/write totals.
-
-4. Cache module
-   - EN caption: Clean cache created during local runs
-   - CN caption: 清理本地运行产生的缓存垃圾
-   - Show: cache estimate, cache directory list, clean cache button.
-
-5. Menu bar and Touch Bar
-   - EN caption: Key signals stay visible
-   - CN caption: 菜单栏与 Touch Bar 随时可见
-   - Show: colored menu bar progress, cockpit popover, and Touch Bar strip if available.
+3. Water Margin collection
+   - EN caption: Collect 108 equal-odds heroes
+   - CN caption: 收集等概率出现的一百单八将
+   - Show: collection progress, disclosed 1/108 odds, card details, and draw controls.
 
 ## Review Notes / 审核备注
 
 English:
-CodexPilot is a local macOS utility for users who run Codex on Mac. It displays Mac system status, disk usage, disk read/write activity, cache estimates, and Codex quota-related information parsed from local Codex session logs when those events are present. The app does not require sign-in, does not upload user data, and does not provide or resell Codex service access. Cache cleaning is performed locally on user-accessible cache directories. CodexPilot is an independent utility and is not affiliated with OpenAI.
 
-Simplified Chinese:
-Codex 驾驶舱是一款面向 Mac 上 Codex 用户的本地 macOS 工具。它显示 Mac 系统状态、硬盘使用率、硬盘读写活动、缓存估算，并在本地 Codex session 日志存在额度事件时解析并显示 Codex 额度相关信息。应用不要求登录，不上传用户数据，也不提供或转售 Codex 服务访问权限。缓存清理仅在用户本机可访问的缓存目录中本地执行。本应用是独立工具，与 OpenAI 无隶属关系。
+Thank you for the review. We made the following changes:
 
-## Privacy Label Draft / 隐私标签草案
+1. We removed the Texas Hold'em points table and all Poker source files from the App Store Release configuration. This submitted binary contains no betting, wagering, casino, Poker, or simulated-gambling content.
+2. We updated the age-rating questionnaire to accurately report `Simulated Gambling: None`.
+3. The remaining Water Margin card collection uses non-purchasable, non-redeemable participation points. All 108 cards have equal odds of 1/108, disclosed before every draw.
+4. The public app name is Lynncat Pilot, and the Simplified Chinese name is 林猫驾驶舱. The existing Bundle ID remains unchanged.
+5. China mainland remains unavailable in Pricing and Availability.
 
-Recommended answer if the app remains local-only and has no analytics, advertising, account system, network upload, or third-party SDK data collection:
+Lynncat Pilot displays local system status, disk usage, disk read/write activity, and quota-related information parsed from readable local coding-session logs when compatible events are present. Monitoring does not require sign-in, and local logs or monitoring data are not uploaded.
 
-- Data Collection: Data Not Collected
+Sign in with Apple is optional and enables the user community, participation points, leaderboard, and Water Margin card collection. Participation points have no cash value, cannot be purchased, and cannot be redeemed.
+
+The app does not provide or resell access to OpenAI, ChatGPT, or Codex services and is not affiliated with OpenAI.
+
+简体中文:
+
+感谢审核。我们已完成以下修改：
+
+1. 我们已从 App Store 的 Release 构建中删除德州扑克牌桌及全部 Poker 源文件。本次提交的二进制不包含下注、投注、赌场、扑克牌桌或任何模拟赌博内容。
+2. 我们已将年龄分级问卷中的“模拟赌博”准确修改为“无”。
+3. 保留的水浒卡册只使用不可购买、不可兑换的参与积分；108 张卡牌出现概率均为 1/108，并在每次抽卡前明确显示。
+4. 应用公开名称为 Lynncat Pilot，简体中文名称为“林猫驾驶舱”，原 Bundle ID 保持不变。
+5. 中国大陆仍未列入销售范围。
+
+林猫驾驶舱显示本地系统状态、硬盘使用率和硬盘读写活动，并在可读取的本地编码会话日志存在兼容事件时解析额度相关信息。监控功能无需登录，本地日志和监控数据不会上传。
+
+Apple 登录为可选功能，用于用户交流、参与积分、排行榜和水浒卡册。参与积分没有现金价值，不能购买或兑现。
+
+本应用不提供或转售 OpenAI、ChatGPT 或 Codex 服务访问权限，与 OpenAI 无隶属关系。
+
+## Privacy Labels / 隐私标签
+
+Update App Store Connect for the current optional account, community, points, and card-collection implementation:
+
+- Data Collection: Data Collected
 - Tracking: No
 - Third-party advertising: No
 - Analytics SDK: No
+- Email or Messages: linked to the user; used for app functionality
+- Game Content: linked to the user; used for app functionality
+- Other User Content: linked to the user; used for app functionality
+- User ID: linked to the user; used for app functionality and account authentication
+- Device ID: linked to the user; used for app functionality, session security, and point-award deduplication
+- Product Interaction: linked to the user; account heartbeat, points balance, leaderboard preference, and card-draw records used for app functionality
+- Other Usage Data: linked to the user; used for app functionality
 
 Developer verification checklist:
-- Confirm the app does not send Codex logs, system metrics, disk I/O metrics, cache paths, or usage information to any server.
-- Confirm no analytics/crash-reporting SDK is added before submission.
+- Confirm the app does not send local coding-session logs, system metrics, disk I/O metrics, or usage information to any server.
+- Confirm no analytics or crash-reporting SDK is added before submission.
 - Confirm the privacy policy is hosted and linked in App Store Connect.
 - Confirm any future network feature updates this privacy label.
 
-## Age Rating / 年龄分级建议
+## Age Rating / 年龄分级
 
-Likely 4+, assuming:
-- No user-generated public content
-- No web browsing
-- No gambling, medical, financial advice, or mature content
-- No account or social features
+Required answers for the Poker-free App Store build:
+
+- User-generated content and social media: Yes, because Lynncat Pilot includes public community messages with reporting and blocking controls
+- Simulated gambling: None
+- Contests: Occasional, because the optional points leaderboard ranks participating users
+- Real-money gambling and purchasable wagering currency: No
+- Loot boxes: No; the app has no in-app purchases, points cannot be purchased, and every draw awards one card
+- Unrestricted web access, medical advice, mature content, violence, and advertising: No
+- Save the questionnaire and use the rating calculated by App Store Connect
 
 ## Pricing / 定价建议
 
-Suggested options:
+Recommended for the first release:
 
-1. Free, no in-app purchases
-   - Best for first release and easiest review path.
+- Free, no in-app purchases.
+- China mainland unavailable.
 
-2. Paid upfront
-   - Suitable if the app is already polished, has complete screenshots, support docs, and clear ongoing maintenance.
+## App Store Connect Submission Checklist / 填写检查
 
-3. Freemium
-   - Not recommended for first release unless subscription/IAP logic is fully designed.
-
-## App Store Connect 填写检查 / Submission Checklist
-
-- App name under 30 characters.
-- Subtitle under 30 characters.
-- Promotional text under 170 characters.
-- Description under 4000 characters.
-- Keywords under 100 bytes per localization.
-- Privacy Policy URL hosted and publicly accessible.
-- Support URL hosted and publicly accessible.
-- Primary category: Developer Tools.
-- App Sandbox enabled in entitlements.
-- Privacy answers match actual behavior.
-- Review notes explain local Codex log parsing and independent/non-affiliated status.
-
-## Sources / 参考
-
-- Apple App Store Connect app information reference: app name and subtitle requirements, privacy policy URL requirement.
-- Apple App Store Connect platform version reference: promotional text, description, keywords, screenshots, support URL.
-- Apple App privacy reference: privacy policy URL and data handling disclosure expectations.
+- Change app name to `Lynncat Pilot`.
+- Change Simplified Chinese app name to `林猫驾驶舱`.
+- Replace both subtitles with the text above.
+- Replace promotional text, description, keywords, and screenshot captions in both localizations.
+- Confirm China mainland remains unavailable after the 24-hour storefront update finishes.
+- Upload screenshots showing the new public name.
+- Upload a build whose product name and display name are `Lynncat Pilot`.
+- Paste the revised Review Notes into the new version before resubmission.
+- Keep Bundle ID `com.lynncat.codexpilot` unchanged.
+- Confirm App Sandbox remains enabled.
+- Confirm privacy answers match actual behavior.
+- Confirm `Simulated Gambling` is set to `None` before resubmission.
+- Confirm `Loot Boxes` remains `No`; the app sells neither points nor randomized items.
+- Paste the revised bilingual Review Notes above into the version submitted for review.

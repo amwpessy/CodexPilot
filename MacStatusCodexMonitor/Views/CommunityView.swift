@@ -58,7 +58,7 @@ struct CommunityView: View {
                     .font(.title2)
                     .fontWeight(.semibold)
                     .foregroundStyle(palette.text)
-                Text("CodexPilot 用户社区，交流本机监控与 Codex 使用体验 / A shared room for CodexPilot users")
+                Text("林猫驾驶舱用户社区，交流本机监控与开发体验 / A shared room for Lynncat Pilot users")
                     .font(.caption)
                     .foregroundStyle(palette.secondaryText)
                     .lineLimit(1)
@@ -86,7 +86,7 @@ struct CommunityView: View {
 
     private var accountPanel: some View {
         CommunityPanel(
-            title: "Lynncat 账户 / Account",
+            title: "林猫驾驶舱账户 / Account",
             subtitle: "登录、在线积分与公开资料 / Sign in, points & profile",
             palette: palette
         ) {
@@ -145,6 +145,10 @@ struct CommunityView: View {
                             saveProfile()
                         }
 
+#if !DIRECT_DISTRIBUTION
+                    CommunityPasswordLinkView(tint: palette.accent)
+#endif
+
                     HStack {
                         Label("在线 \(account.activeSeconds / 60) 分钟 / Active \(account.activeSeconds / 60)m", systemImage: "clock")
                             .font(.caption2)
@@ -162,7 +166,7 @@ struct CommunityView: View {
                     Text("登录后，应用保持运行时可累计积分；每次发言消耗 3 积分。")
                         .font(.callout)
                         .foregroundStyle(palette.text)
-                    Text("Sign in to earn points while CodexPilot is active and join the discussion.")
+                    Text("Sign in to earn points while Lynncat Pilot is active and join the discussion.")
                         .font(.caption)
                         .foregroundStyle(palette.secondaryText)
                     CommunitySignInButton(tint: palette.accent)
@@ -204,7 +208,7 @@ struct CommunityView: View {
 
     private var discussionPanel: some View {
         CommunityPanel(
-            title: "CodexPilot 交流室 / Discussion",
+            title: "林猫驾驶舱交流室 / Discussion",
             subtitle: "每次发言 3 积分；请勿发布链接、联系方式或敏感信息 / 3 points per post; keep it safe and useful",
             palette: palette
         ) {
@@ -370,9 +374,13 @@ private struct CommunitySignInButton: View {
     var tint: Color
     @State private var nonce = ""
     @State private var feedback: String?
+    @State private var username = ""
+    @State private var password = ""
+    @State private var isRegistering = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 10) {
+#if !DIRECT_DISTRIBUTION
             SignInWithAppleButton(.continue) { request in
                 nonce = makeNonce()
                 request.requestedScopes = []
@@ -383,20 +391,79 @@ private struct CommunitySignInButton: View {
             .signInWithAppleButtonStyle(.black)
             .frame(maxWidth: 230, minHeight: 38)
             .disabled(account.isSigningIn)
+#else
+            Picker("", selection: $isRegistering) {
+                Text("登录 / Sign in").tag(false)
+                Text("注册 / Create").tag(true)
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .frame(maxWidth: 330)
 
-            if account.isSigningIn {
-                HStack(spacing: 6) {
+            TextField("林猫账号 / Lynncat username", text: $username)
+                .textFieldStyle(.roundedBorder)
+                .frame(maxWidth: 330)
+                .onSubmit(submitPasswordLogin)
+
+            SecureField("密码 / Password", text: $password)
+                .textFieldStyle(.roundedBorder)
+                .frame(maxWidth: 330)
+                .onSubmit(submitPasswordLogin)
+
+            HStack(spacing: 8) {
+                Button(action: submitPasswordLogin) {
+                    Label(
+                        isRegistering ? "创建并登录 / Create account" : "登录 / Sign in",
+                        systemImage: isRegistering ? "person.badge.plus" : "person.crop.circle.badge.checkmark"
+                    )
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(tint)
+                .disabled(account.isSigningIn || !passwordInputIsValid)
+
+                if account.isSigningIn {
                     ProgressView().controlSize(.small)
-                    Text("正在登录 / Signing in")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
                 }
             }
+
+            Text(
+                "账号 4–32 位，可使用字母、数字、点、横线或下划线；密码至少 8 位并包含字母和数字。\n"
+                    + "Username: 4–32 letters, numbers, dots, hyphens or underscores. Password: at least 8 characters with letters and numbers."
+            )
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: 360, alignment: .leading)
+#endif
 
             if let feedback {
                 Text(feedback)
                     .font(.caption2)
                     .foregroundStyle(.red)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    private var passwordInputIsValid: Bool {
+        CommunityCredentialRules.areValid(username: username, password: password)
+    }
+
+    private func submitPasswordLogin() {
+        guard passwordInputIsValid, !account.isSigningIn else { return }
+        let requestedUsername = username.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        let requestedPassword = password
+        Task { @MainActor in
+            do {
+                try await account.signIn(
+                    username: requestedUsername,
+                    password: requestedPassword,
+                    registering: isRegistering
+                )
+                password = ""
+                feedback = nil
+            } catch {
+                feedback = signInFeedback(for: error)
             }
         }
     }
@@ -433,6 +500,18 @@ private struct CommunitySignInButton: View {
         case CommunityServiceError.requestTimedOut:
             return "登录请求超时，请检查网络后重试 / Sign-in timed out. Check your connection and try again"
         case let CommunityServiceError.server(statusCode, code):
+            switch code {
+            case "invalid_login":
+                return "账号或密码不正确 / Incorrect username or password"
+            case "username_unavailable":
+                return "该账号已被使用 / Username is already in use"
+            case "login_temporarily_locked":
+                return "尝试次数过多，请 15 分钟后重试 / Too many attempts; try again in 15 minutes"
+            case "invalid_username", "invalid_password":
+                return "账号或密码格式不符合要求 / Username or password does not meet the requirements"
+            default:
+                break
+            }
             return "服务拒绝登录（\(statusCode): \(code)）/ Sign-in rejected (\(statusCode): \(code))"
         case CommunityServiceError.keychain:
             return "无法保存登录会话，请检查钥匙串访问权限 / Could not save the session to Keychain"
@@ -453,6 +532,90 @@ private struct CommunitySignInButton: View {
 
     private func sha256(_ value: String) -> String {
         SHA256.hash(data: Data(value.utf8)).map { String(format: "%02x", $0) }.joined()
+    }
+}
+
+private struct CommunityPasswordLinkView: View {
+    @ObservedObject private var account = CommunityAccountStore.shared
+    var tint: Color
+    @State private var isExpanded = false
+    @State private var username = ""
+    @State private var password = ""
+    @State private var feedback: String?
+
+    var body: some View {
+        DisclosureGroup(isExpanded: $isExpanded) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(linkDescription)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                TextField("林猫账号 / Lynncat username", text: $username)
+                    .textFieldStyle(.roundedBorder)
+                SecureField("新密码 / New password", text: $password)
+                    .textFieldStyle(.roundedBorder)
+
+                HStack(spacing: 8) {
+                    Button {
+                        linkLogin()
+                    } label: {
+                        Label("绑定账号 / Link login", systemImage: "link")
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(tint)
+                    .disabled(account.isLinkingLogin || !inputIsValid)
+
+                    if account.isLinkingLogin {
+                        ProgressView().controlSize(.small)
+                    }
+                }
+
+                if let feedback {
+                    Text(feedback)
+                        .font(.caption2)
+                        .foregroundStyle(feedback.hasPrefix("已") ? .green : .red)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .padding(.top, 8)
+        } label: {
+            Label("设置林猫账号 / Set up Lynncat login", systemImage: "key")
+                .font(.caption)
+                .foregroundStyle(tint)
+        }
+    }
+
+    private var linkDescription: String {
+#if DIRECT_DISTRIBUTION
+        "绑定后，网站下载版可使用同一账号登录，并继续使用当前积分、留言、牌桌和卡册数据。"
+#else
+        "绑定后，网站下载版可使用同一账号登录，并继续使用当前积分、留言和卡册数据。"
+#endif
+    }
+
+    private var inputIsValid: Bool {
+        CommunityCredentialRules.areValid(username: username, password: password)
+    }
+
+    private func linkLogin() {
+        guard inputIsValid, !account.isLinkingLogin else { return }
+        let requestedUsername = username.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        let requestedPassword = password
+        Task { @MainActor in
+            do {
+                try await account.linkPasswordLogin(
+                    username: requestedUsername,
+                    password: requestedPassword
+                )
+                password = ""
+                feedback = "已绑定，可在网站下载版登录 / Linked for the direct edition"
+            } catch let CommunityServiceError.server(_, code) where code == "username_unavailable" {
+                feedback = "该账号已被使用 / Username is already in use"
+            } catch {
+                feedback = "绑定失败，请稍后重试 / Could not link login"
+            }
+        }
     }
 }
 

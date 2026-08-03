@@ -37,6 +37,14 @@
 		A1B2C3D4E5F6000100000041 /* CommunityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000021 /* CommunityService.swift */; };
 		A1B2C3D4E5F6000100000042 /* CommunityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000022 /* CommunityView.swift */; };
 		A1B2C3D4E5F6000100000043 /* CommunityServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000023 /* CommunityServiceTests.swift */; };
+		A1B2C3D4E5F6000100000044 /* PokerModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000024 /* PokerModels.swift */; };
+		A1B2C3D4E5F6000100000045 /* PokerGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000025 /* PokerGame.swift */; };
+		A1B2C3D4E5F6000100000046 /* PokerGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000026 /* PokerGameView.swift */; };
+		A1B2C3D4E5F6000100000047 /* PokerModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000027 /* PokerModelsTests.swift */; };
+		A1B2C3D4E5F6000100000048 /* PokerSoundPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000028 /* PokerSoundPlayer.swift */; };
+		A1B2C3D4E5F6000100000049 /* ShuihuCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6000200000029 /* ShuihuCards.swift */; };
+		A1B2C3D4E5F600010000004A /* ShuihuCardGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600020000002A /* ShuihuCardGameView.swift */; };
+		A1B2C3D4E5F600010000004B /* ShuihuCardsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600020000002B /* ShuihuCardsTests.swift */; };
 		A1B2C3D4E5F6000100000040 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F600020000001F /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -54,7 +62,7 @@
 		A1B2C3D4E5F6000200000001 /* MacStatusCodexMonitorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacStatusCodexMonitorApp.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6000200000002 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6000200000003 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A1B2C3D4E5F6000200000004 /* CodexPilot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CodexPilot.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1B2C3D4E5F6000200000004 /* Lynncat Pilot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Lynncat Pilot.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1B2C3D4E5F6000200000005 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		A1B2C3D4E5F6000200000006 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		A1B2C3D4E5F6000200000007 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
@@ -83,9 +91,18 @@
 		A1B2C3D4E5F600020000001E /* TouchBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TouchBarController.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F600020000001F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A1B2C3D4E5F6000200000020 /* CodexPilot.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CodexPilot.entitlements; sourceTree = "<group>"; };
+		A1B2C3D4E5F600020000002C /* CodexPilotDirect.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CodexPilotDirect.entitlements; sourceTree = "<group>"; };
 		A1B2C3D4E5F6000200000021 /* CommunityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunityService.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6000200000022 /* CommunityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunityView.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6000200000023 /* CommunityServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunityServiceTests.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000200000024 /* PokerModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokerModels.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000200000025 /* PokerGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokerGame.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000200000026 /* PokerGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokerGameView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000200000027 /* PokerModelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokerModelsTests.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000200000028 /* PokerSoundPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokerSoundPlayer.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6000200000029 /* ShuihuCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShuihuCards.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600020000002A /* ShuihuCardGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShuihuCardGameView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F600020000002B /* ShuihuCardsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShuihuCardsTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -132,6 +149,7 @@
 				A1B2C3D4E5F600010000003C /* Views */,
 				A1B2C3D4E5F600020000001F /* Assets.xcassets */,
 				A1B2C3D4E5F6000200000020 /* CodexPilot.entitlements */,
+				A1B2C3D4E5F600020000002C /* CodexPilotDirect.entitlements */,
 				A1B2C3D4E5F6000200000003 /* Info.plist */,
 			);
 			path = MacStatusCodexMonitor;
@@ -158,6 +176,8 @@
 				A1B2C3D4E5F6000200000019 /* AppStateTests.swift */,
 				A1B2C3D4E5F600020000001D /* TouchBarControllerTests.swift */,
 				A1B2C3D4E5F6000200000023 /* CommunityServiceTests.swift */,
+				A1B2C3D4E5F6000200000027 /* PokerModelsTests.swift */,
+				A1B2C3D4E5F600020000002B /* ShuihuCardsTests.swift */,
 			);
 			path = MacStatusCodexMonitorTests;
 			sourceTree = "<group>";
@@ -176,7 +196,7 @@
 		A1B2C3D4E5F6000100000010 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A1B2C3D4E5F6000200000004 /* CodexPilot.app */,
+				A1B2C3D4E5F6000200000004 /* Lynncat Pilot.app */,
 				A1B2C3D4E5F6000200000009 /* MacStatusCodexMonitorTests.xctest */,
 			);
 			name = Products;
@@ -188,6 +208,10 @@
 				A1B2C3D4E5F600020000000B /* SystemSnapshot.swift */,
 				A1B2C3D4E5F600020000000C /* DiskSnapshot.swift */,
 				A1B2C3D4E5F600020000000D /* CodexQuotaSnapshot.swift */,
+				A1B2C3D4E5F6000200000024 /* PokerModels.swift */,
+				A1B2C3D4E5F6000200000025 /* PokerGame.swift */,
+				A1B2C3D4E5F6000200000028 /* PokerSoundPlayer.swift */,
+				A1B2C3D4E5F6000200000029 /* ShuihuCards.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -219,6 +243,8 @@
 				A1B2C3D4E5F600020000001B /* DashboardView.swift */,
 				A1B2C3D4E5F600020000001C /* MenuBarPopoverView.swift */,
 				A1B2C3D4E5F6000200000022 /* CommunityView.swift */,
+				A1B2C3D4E5F6000200000026 /* PokerGameView.swift */,
+				A1B2C3D4E5F600020000002A /* ShuihuCardGameView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -248,7 +274,7 @@
 			);
 			name = MacStatusCodexMonitor;
 			productName = MacStatusCodexMonitor;
-			productReference = A1B2C3D4E5F6000200000004 /* CodexPilot.app */;
+			productReference = A1B2C3D4E5F6000200000004 /* Lynncat Pilot.app */;
 			productType = "com.apple.product-type.application";
 		};
 		A1B2C3D4E5F6000100000019 /* MacStatusCodexMonitorTests */ = {
@@ -349,6 +375,12 @@
 				A1B2C3D4E5F600010000003E /* TouchBarController.swift in Sources */,
 				A1B2C3D4E5F6000100000041 /* CommunityService.swift in Sources */,
 				A1B2C3D4E5F6000100000042 /* CommunityView.swift in Sources */,
+				A1B2C3D4E5F6000100000044 /* PokerModels.swift in Sources */,
+				A1B2C3D4E5F6000100000045 /* PokerGame.swift in Sources */,
+				A1B2C3D4E5F6000100000046 /* PokerGameView.swift in Sources */,
+				A1B2C3D4E5F6000100000048 /* PokerSoundPlayer.swift in Sources */,
+				A1B2C3D4E5F6000100000049 /* ShuihuCards.swift in Sources */,
+				A1B2C3D4E5F600010000004A /* ShuihuCardGameView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -363,6 +395,8 @@
 				A1B2C3D4E5F6000100000038 /* AppStateTests.swift in Sources */,
 				A1B2C3D4E5F600010000003D /* TouchBarControllerTests.swift in Sources */,
 				A1B2C3D4E5F6000100000043 /* CommunityServiceTests.swift in Sources */,
+				A1B2C3D4E5F6000100000047 /* PokerModelsTests.swift in Sources */,
+				A1B2C3D4E5F600010000004B /* ShuihuCardsTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -401,6 +435,30 @@
 			};
 			name = Debug;
 		};
+		D1B2C3D4E5F600010000001B /* DirectDebug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = DirectDebug;
+		};
 		A1B2C3D4E5F600010000001C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -420,14 +478,35 @@
 			};
 			name = Release;
 		};
+		D1B2C3D4E5F600010000001C /* DirectRelease */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 5.0;
+			};
+			name = DirectRelease;
+		};
 		A1B2C3D4E5F600010000001D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APP_DISPLAY_NAME = "Lynncat Pilot";
+				APP_MARKETING_VERSION = 1.4;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_ENTITLEMENTS = MacStatusCodexMonitor/CodexPilot.entitlements;
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = HJT66Q2FWA;
 				ENABLE_TESTABILITY = YES;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -440,22 +519,60 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.lynncat.codexpilot;
 				PROVISIONING_PROFILE_SPECIFIER = "CodexPilot macOS Development";
 				PRODUCT_MODULE_NAME = MacStatusCodexMonitor;
-				PRODUCT_NAME = CodexPilot;
+				PRODUCT_NAME = "Lynncat Pilot";
 				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) POKER_FEATURE";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
+		D1B2C3D4E5F600010000001D /* DirectDebug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APP_DISPLAY_NAME = "Lynncat Pilot Direct";
+				APP_MARKETING_VERSION = 1.4;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MacStatusCodexMonitor/CodexPilotDirect.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_TEAM = HJT66Q2FWA;
+				ENABLE_TESTABILITY = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MacStatusCodexMonitor/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lynncat.codexpilot.direct;
+				PRODUCT_MODULE_NAME = MacStatusCodexMonitor;
+				PRODUCT_NAME = "Lynncat Pilot Direct";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DIRECT_DISTRIBUTION POKER_FEATURE";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = DirectDebug;
+		};
 		A1B2C3D4E5F600010000001E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APP_DISPLAY_NAME = "Lynncat Pilot";
+				APP_MARKETING_VERSION = 1.4;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = MacStatusCodexMonitor/CodexPilot.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = HJT66Q2FWA;
+				EXCLUDED_SOURCE_FILE_NAMES = (
+					PokerGame.swift,
+					PokerGameView.swift,
+					PokerModels.swift,
+					PokerSoundPlayer.swift,
+				);
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MacStatusCodexMonitor/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -465,46 +582,111 @@
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.lynncat.codexpilot;
 				PRODUCT_MODULE_NAME = MacStatusCodexMonitor;
-				PRODUCT_NAME = CodexPilot;
+				PRODUCT_NAME = "Lynncat Pilot";
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
+		D1B2C3D4E5F600010000001E /* DirectRelease */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APP_DISPLAY_NAME = "Lynncat Pilot Direct";
+				APP_MARKETING_VERSION = 1.4;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MacStatusCodexMonitor/CodexPilotDirect.entitlements;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_TEAM = HJT66Q2FWA;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MacStatusCodexMonitor/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lynncat.codexpilot.direct;
+				PRODUCT_MODULE_NAME = MacStatusCodexMonitor;
+				PRODUCT_NAME = "Lynncat Pilot Direct";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DIRECT_DISTRIBUTION POKER_FEATURE";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = DirectRelease;
+		};
 		A1B2C3D4E5F600010000001F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				PRODUCT_BUNDLE_IDENTIFIER = local.MacStatusCodexMonitorTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CodexPilot.app/Contents/MacOS/CodexPilot";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Lynncat Pilot.app/Contents/MacOS/Lynncat Pilot";
 				TEST_TARGET_NAME = MacStatusCodexMonitor;
 			};
 			name = Debug;
+		};
+		D1B2C3D4E5F600010000001F /* DirectDebug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 3;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = local.MacStatusCodexMonitorTests.direct;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DIRECT_DISTRIBUTION";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Lynncat Pilot Direct.app/Contents/MacOS/Lynncat Pilot Direct";
+				TEST_TARGET_NAME = MacStatusCodexMonitor;
+			};
+			name = DirectDebug;
 		};
 		A1B2C3D4E5F6000100000020 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				PRODUCT_BUNDLE_IDENTIFIER = local.MacStatusCodexMonitorTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CodexPilot.app/Contents/MacOS/CodexPilot";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Lynncat Pilot.app/Contents/MacOS/Lynncat Pilot";
 				TEST_TARGET_NAME = MacStatusCodexMonitor;
 			};
 			name = Release;
+		};
+		D1B2C3D4E5F6000100000020 /* DirectRelease */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 3;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = local.MacStatusCodexMonitorTests.direct;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DIRECT_DISTRIBUTION";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Lynncat Pilot Direct.app/Contents/MacOS/Lynncat Pilot Direct";
+				TEST_TARGET_NAME = MacStatusCodexMonitor;
+			};
+			name = DirectRelease;
 		};
 /* End XCBuildConfiguration section */
 
@@ -514,6 +696,8 @@
 			buildConfigurations = (
 				A1B2C3D4E5F600010000001B /* Debug */,
 				A1B2C3D4E5F600010000001C /* Release */,
+				D1B2C3D4E5F600010000001B /* DirectDebug */,
+				D1B2C3D4E5F600010000001C /* DirectRelease */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -523,6 +707,8 @@
 			buildConfigurations = (
 				A1B2C3D4E5F600010000001D /* Debug */,
 				A1B2C3D4E5F600010000001E /* Release */,
+				D1B2C3D4E5F600010000001D /* DirectDebug */,
+				D1B2C3D4E5F600010000001E /* DirectRelease */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -532,6 +718,8 @@
 			buildConfigurations = (
 				A1B2C3D4E5F600010000001F /* Debug */,
 				A1B2C3D4E5F6000100000020 /* Release */,
+				D1B2C3D4E5F600010000001F /* DirectDebug */,
+				D1B2C3D4E5F6000100000020 /* DirectRelease */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

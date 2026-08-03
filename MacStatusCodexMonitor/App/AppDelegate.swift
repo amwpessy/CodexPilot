@@ -51,12 +51,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @MainActor
     func applicationDidFinishLaunching(_ notification: Notification) {
+        if state == nil, ProcessInfo.processInfo.environment["XCTestBundlePath"] != nil {
+            return
+        }
         let state = ensureState()
-        NSApp.setActivationPolicy(.accessory)
+        let application = NSApplication.shared
+        application.setActivationPolicy(.accessory)
         installMenuBarItem(state: state)
         let touchController = TouchBarController(state: state)
         touchBarController = touchController
-        NSApp.touchBar = touchController.makeTouchBar()
+        application.touchBar = touchController.makeTouchBar()
         observeStateForMenuBarTitle()
         observeDashboardThemeChanges()
         startMenuBarRotationTimer()
@@ -83,12 +87,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let state = ensureState()
         if dashboardWindow == nil {
             let window = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 1_080, height: 660),
+                contentRect: NSRect(x: 0, y: 0, width: 1_180, height: 820),
                 styleMask: [.titled, .closable, .miniaturizable, .resizable],
                 backing: .buffered,
                 defer: false
             )
-            window.title = "Codex 驾驶舱 / CodexPilot"
+            window.title = "林猫驾驶舱 / Lynncat Pilot"
             window.contentView = NSHostingView(rootView: DashboardView(state: state))
             window.delegate = self
             window.isReleasedWhenClosed = false
